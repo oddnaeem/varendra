@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Science Lab — A Working Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF3EF;
+    --panel:#FFFFFF;
+    --ink:#16241C;
+    --ink-soft:#4B5A50;
+    --line:#CBD6CC;
+    --green:#2F6B4F;
+    --green-deep:#1F4A36;
+    --tomato:#D8492E;
+    --turmeric:#E0A233;
+    --instrument-bg:#10201A;
+    --instrument-text:#8FEFC0;
+    --instrument-amber:#F0C46A;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+  }
+  h1,h2,h3,.display{
+    font-family:'Space Grotesk',sans-serif;
+    letter-spacing:-0.01em;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  ::selection{background:var(--turmeric); color:var(--ink);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  /* ---------- LAYOUT SHELL ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    max-width:1280px;
+    margin:0 auto;
+  }
+  @media (max-width:880px){
+    .shell{grid-template-columns:1fr;}
+  }
+
+  /* ---------- NAV RAIL ---------- */
+  .rail{
+    position:sticky; top:0; align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 14px 28px 24px;
+    border-right:1px solid var(--line);
+  }
+  @media (max-width:880px){
+    .rail{
+      position:sticky; top:0; height:auto;
+      display:flex; gap:6px; overflow-x:auto; overflow-y:hidden;
+      padding:12px 16px; border-right:none; border-bottom:1px solid var(--line);
+      background:var(--paper); z-index:50;
+    }
+  }
+  .rail-brand{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:15px;
+    margin-bottom:22px; display:flex; align-items:center; gap:8px;
+  }
+  @media (max-width:880px){ .rail-brand{display:none;} }
+  .rail-brand .dot{width:9px;height:9px;border-radius:50%;background:var(--tomato);flex-shrink:0;}
+  .rail a{
+    display:block;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    padding:7px 10px;
+    border-radius:8px;
+    white-space:nowrap;
+    border-left:2px solid transparent;
+    transition:background .15s, color .15s;
+  }
+  .rail a:hover{background:#E2E9E2; color:var(--ink);}
+  .rail a:focus-visible{outline:2px solid var(--green); outline-offset:2px;}
+  .rail a .n{font-family:'IBM Plex Mono',monospace; opacity:.6; margin-right:6px;}
+  @media (max-width:880px){
+    .rail a{border-left:none; border-bottom:2px solid transparent; padding:6px 10px;}
+  }
+
+  /* ---------- MAIN ---------- */
+  main{padding:0 0 80px;}
+
+  /* Hero */
+  .hero{
+    padding:64px 40px 48px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  @media (max-width:600px){.hero{padding:40px 20px 32px;}}
+  .hero .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--green-deep); margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:clamp(34px,5.4vw,58px);
+    font-weight:700; margin:0 0 18px; max-width:16ch;
+  }
+  .hero p.lede{max-width:52ch; color:var(--ink-soft); font-size:17px; margin:0 0 26px;}
+  .hero-tags{display:flex; flex-wrap:wrap; gap:8px;}
+  .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px;
+    padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+    background:var(--panel); color:var(--ink-soft);
+  }
+
+  /* Station block */
+  .station{
+    padding:56px 40px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  @media (max-width:600px){.station{padding:40px 20px;}}
+  .station .stationhead{
+    display:flex; align-items:baseline; gap:16px; margin-bottom:28px;
+    position:relative;
+  }
+  .station .ghost-num{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(48px,8vw,96px);
+    font-weight:700; color:transparent;
+    -webkit-text-stroke:1px var(--line);
+    position:absolute; right:0; top:-20px; z-index:0; user-select:none;
+    line-height:1;
+  }
+  @media (max-width:700px){.station .ghost-num{display:none;}}
+  .station h2{
+    font-size:clamp(22px,3vw,30px); margin:0; position:relative; z-index:1;
+  }
+  .station .kicker{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--green);
+    display:block; margin-bottom:6px;
+  }
+  .station .intro{max-width:64ch; color:var(--ink-soft); margin:0 0 30px;}
+
+  .grid{display:grid; gap:16px;}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  @media (max-width:760px){
+    .grid.cols-3, .grid.cols-2{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+  }
+  .card h3{font-size:16px; margin:0 0 8px;}
+  .card ul{margin:8px 0 0; padding-left:18px; color:var(--ink-soft); font-size:14.5px;}
+  .card p{color:var(--ink-soft); font-size:14.5px; margin:6px 0 0;}
+  .card .label{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--green); display:block; margin-bottom:6px;
+  }
+
+  /* instrument tag / readout, the recurring signature motif */
+  .instrument{
+    background:var(--instrument-bg);
+    color:var(--instrument-text);
+    border-radius:10px;
+    padding:12px 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+  }
+  .instrument .k{color:#9FB3A6; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:3px;}
+  .instrument .v{font-size:15px; color:var(--instrument-text);}
+  .instrument.amber .v{color:var(--instrument-amber);}
+
+  table{width:100%; border-collapse:collapse; font-size:14px;}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line);}
+  th{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-weight:500;}
+
+  .btn{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+    background:var(--green); color:#fff; border:none;
+    padding:10px 16px; border-radius:8px; cursor:pointer;
+    transition:transform .1s, background .15s;
+  }
+  .btn:hover{background:var(--green-deep);}
+  .btn:active{transform:scale(.97);}
+  .btn.ghost{background:transparent; color:var(--green-deep); border:1px solid var(--line);}
+  .btn.ghost:hover{background:#E2E9E2;}
+  .btn:focus-visible, select:focus-visible, .chip:focus-visible{outline:2px solid var(--green); outline-offset:2px;}
+
+  /* ---------- SORTER PUZZLE ---------- */
+  .sorter-pool{
+    display:flex; flex-wrap:wrap; gap:8px;
+    padding:14px; border:1px dashed var(--line); border-radius:12px;
+    min-height:52px; margin-bottom:16px;
+  }
+  .chip{
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+    background:var(--panel); border:1px solid var(--ink); color:var(--ink);
+    padding:8px 12px; border-radius:8px; cursor:pointer;
+    transition:background .12s, color .12s;
+  }
+  .chip.selected{background:var(--turmeric); border-color:var(--turmeric); color:var(--ink);}
+  .chip.correct{background:var(--green); border-color:var(--green); color:#fff; cursor:default;}
+  .chip.incorrect{background:var(--tomato); border-color:var(--tomato); color:#fff;}
+  .bins{display:grid; gap:12px;}
+  .bins.n3{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:700px){.bins.n3{grid-template-columns:1fr;}}
+  .bin{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:12px; min-height:110px;
+  }
+  .bin h4{margin:0 0 8px; font-size:13px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.05em; color:var(--green-deep);}
+  .bin .zone{display:flex; flex-wrap:wrap; gap:6px; min-height:40px;}
+  .sorter-actions{display:flex; gap:10px; margin-top:14px; align-items:center; flex-wrap:wrap;}
+  .sorter-score{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft);}
+
+  /* ---------- MATCHING GAME ---------- */
+  .match-wrap{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+  @media (max-width:700px){.match-wrap{grid-template-columns:1fr;}}
+  .match-col{display:flex; flex-direction:column; gap:8px;}
+  .match-item{
+    font-family:'IBM Plex Mono',monospace; font-size:13.5px;
+    background:var(--panel); border:1px solid var(--ink); color:var(--ink);
+    padding:12px 14px; border-radius:8px; cursor:pointer; text-align:left;
+    transition:background .12s,color .12s;
+  }
+  .match-item.selected{background:var(--turmeric); border-color:var(--turmeric);}
+  .match-item.locked{background:var(--green); border-color:var(--green); color:#fff; cursor:default;}
+  .match-item.wrong{background:var(--tomato); border-color:var(--tomato); color:#fff;}
+
+  /* ---------- GAP FILL ---------- */
+  .gapfill p{font-size:16.5px; line-height:2.1; max-width:70ch;}
+  select.blank{
+    font-family:'IBM Plex Mono',monospace; font-size:13.5px;
+    padding:4px 8px; border-radius:6px; border:1.5px solid var(--ink);
+    background:var(--panel); color:var(--ink); margin:0 2px;
+  }
+  select.blank.correct{border-color:var(--green); background:#E4F1E9;}
+  select.blank.incorrect{border-color:var(--tomato); background:#FBE7E2;}
+
+  /* ---------- REORDER PUZZLE ---------- */
+  .reorder-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; max-width:560px;}
+  .reorder-list li{
+    display:flex; align-items:center; gap:10px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; font-size:14px;
+  }
+  .reorder-list li.correct{border-color:var(--green); background:#E4F1E9;}
+  .reorder-list li.incorrect{border-color:var(--tomato); background:#FBE7E2;}
+  .reorder-list .step-idx{
+    font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); width:20px; flex-shrink:0;
+  }
+  .reorder-list .arrows{display:flex; flex-direction:column; gap:2px; margin-left:auto;}
+  .arrows button{
+    width:26px; height:22px; border:1px solid var(--line); background:var(--panel);
+    border-radius:4px; cursor:pointer; font-size:11px; line-height:1;
+  }
+  .arrows button:hover{background:#E2E9E2;}
+
+  /* ---------- SIMULATOR (signature) ---------- */
+  .sim{
+    background:var(--instrument-bg); color:#dfeee5;
+    border-radius:18px; padding:28px; display:grid; grid-template-columns:1.1fr 1fr; gap:28px;
+  }
+  @media (max-width:800px){.sim{grid-template-columns:1fr;}}
+  .sim h3{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:#9FB3A6; margin:0 0 18px; font-weight:500;}
+  .sim input[type=range]{width:100%; accent-color:var(--instrument-text);}
+  .sim-readout{font-family:'IBM Plex Mono',monospace; font-size:46px; color:var(--instrument-text); margin:10px 0 2px;}
+  .sim-status{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--instrument-amber); min-height:18px;}
+  .sim-gauge{height:10px; border-radius:6px; background:#1c332a; overflow:hidden; margin:16px 0;}
+  .sim-gauge-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--green),var(--tomato)); transition:width .15s;}
+  .sim-legend{display:flex; justify-content:space-between; font-size:11px; font-family:'IBM Plex Mono',monospace; color:#9FB3A6;}
+  .sim-enzymes{display:flex; flex-direction:column; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:12.5px;}
+  .sim-enzymes .row{display:flex; justify-content:space-between; border-bottom:1px solid #1c332a; padding-bottom:6px;}
+  .sim-time-btns{display:flex; gap:8px; margin-top:14px;}
+  .sim-time-btns button{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; padding:8px 12px;
+    border-radius:8px; border:1px solid #2b4a3c; background:transparent; color:#dfeee5; cursor:pointer;
+  }
+  .sim-time-btns button.active{background:var(--green); border-color:var(--green);}
+
+  /* quiz */
+  .quiz-q{margin-bottom:20px;}
+  .quiz-q p{font-weight:600; margin:0 0 8px;}
+  .quiz-opts{display:flex; flex-wrap:wrap; gap:8px;}
+  .quiz-opt{
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+    padding:8px 12px; border-radius:8px; border:1px solid var(--ink);
+    background:var(--panel); cursor:pointer;
+  }
+  .quiz-opt.selected{background:var(--turmeric); border-color:var(--turmeric);}
+  .quiz-opt.correct{background:var(--green); color:#fff; border-color:var(--green);}
+  .quiz-opt.incorrect{background:var(--tomato); color:#fff; border-color:var(--tomato);}
+
+  footer{padding:40px; text-align:center; color:var(--ink-soft); font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="rail" aria-label="Lab stations">
+    <div class="rail-brand"><span class="dot"></span> FOOD SCI LAB</div>
+    <a href="#s1"><span class="n">01</span>Intake</a>
+    <a href="#s2"><span class="n">02</span>Sourcing</a>
+    <a href="#s3"><span class="n">03</span>Quality Check</a>
+    <a href="#s4"><span class="n">04</span>Sorting Bench</a>
+    <a href="#s5"><span class="n">05</span>Nutrient Match</a>
+    <a href="#s6"><span class="n">06</span>Function Sort</a>
+    <a href="#s7"><span class="n">07</span>Field Guide</a>
+    <a href="#s8"><span class="n">08</span>Gap-Fill</a>
+    <a href="#s9"><span class="n">09</span>Processing Sort</a>
+    <a href="#s10"><span class="n">10</span>Blanching Lab</a>
+    <a href="#s11"><span class="n">11</span>Field Notes</a>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Practical Food Science &middot; Interactive Bench</div>
+      <h1>Walk the bench. Sort the specimens. Run the blanching lab.</h1>
+      <p class="lede">Eleven stations, each built around one idea from food science — from what counts as food, to why a 37°C kitchen counter is the worst place to leave spinach. Sort, match, fill gaps, and reorder your way through.</p>
+      <div class="hero-tags">
+        <span class="tag">4 sorting puzzles</span>
+        <span class="tag">1 matching game</span>
+        <span class="tag">gap-fill quiz</span>
+        <span class="tag">reorder puzzle</span>
+        <span class="tag">live enzyme simulator</span>
+      </div>
+    </section>
+
+    <!-- STATION 01 -->
+    <section class="station" id="s1">
+      <div class="ghost-num">01</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 01 — Intake</span><h2>What Is Food?</h2></div>
+      </div>
+      <p class="intro">Food is any edible substance that supplies the body with energy and nutrients — essential for life, body function, and growth.</p>
+      <div class="grid cols-3">
+        <div class="card"><span class="label">Provides</span><h3>Energy</h3><p>Fuels physical and mental activity.</p></div>
+        <div class="card"><span class="label">Supports</span><h3>Growth &amp; repair</h3><p>Builds tissue and repairs damage.</p></div>
+        <div class="card"><span class="label">Maintains</span><h3>Body function</h3><p>Keeps normal processes running and helps prevent disease.</p></div>
+      </div>
+    </section>
+
+    <!-- STATION 02 -->
+    <section class="station" id="s2">
+      <div class="ghost-num">02</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 02 — Sourcing</span><h2>Where Food Comes From</h2></div>
+      </div>
+      <p class="intro">Three natural sources, three different nutrient profiles.</p>
+      <div class="grid cols-3">
+        <div class="card">
+          <span class="label">Plant sources</span><h3>Carbs, vitamins, fiber</h3>
+          <ul><li>Fruits &amp; vegetables</li><li>Cereals, wheat, rice, corn</li></ul>
+        </div>
+        <div class="card">
+          <span class="label">Animal sources</span><h3>High-quality protein &amp; fat</h3>
+          <ul><li>Meat, fish, eggs</li><li>Milk &amp; dairy</li></ul>
+        </div>
+        <div class="card">
+          <span class="label">Other sources</span><h3>Aquatic organisms</h3>
+          <ul><li>Seafood</li><li>Seaweed, microalgae</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATION 03 -->
+    <section class="station" id="s3">
+      <div class="ghost-num">03</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 03 — Quality Check</span><h2>What Makes Food "Good"?</h2></div>
+      </div>
+      <p class="intro">Good food is judged on three fronts — plus it carries cultural and economic weight beyond the plate.</p>
+      <div class="grid cols-3">
+        <div class="card"><span class="label">Nutritional quality</span><h3>Meets the body's needs</h3><p>Contains essential nutrients in the right amounts.</p></div>
+        <div class="card"><span class="label">Food safety</span><h3>Free from harm</h3><p>No harmful microorganisms, toxins, or contaminants.</p></div>
+        <div class="card"><span class="label">Sensory properties</span><h3>Taste, aroma, texture</h3><p>Also judged by color and appearance.</p></div>
+      </div>
+      <div class="instrument" style="margin-top:16px; max-width:520px;">
+        <span class="k">Also true of food</span>
+        <span class="v">Reflects culture · shapes regional habits · drives agriculture &amp; economy</span>
+      </div>
+    </section>
+
+    <!-- STATION 04: SORTER PUZZLE 1 + 2 -->
+    <section class="station" id="s4">
+      <div class="ghost-num">04</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 04 — Sorting Bench · Puzzle</span><h2>Classify by Perishability, then by pH</h2></div>
+      </div>
+      <p class="intro">Tap a specimen to select it, then tap the bin it belongs in.</p>
+
+      <h3 style="font-size:14px; margin:0 0 10px;">Puzzle A — Perishability</h3>
+      <div id="sorter1"></div>
+
+      <h3 style="font-size:14px; margin:32px 0 10px;">Puzzle B — Effect on Acid-Base Balance (pH)</h3>
+      <div id="sorter2"></div>
+    </section>
+
+    <!-- STATION 05: MATCHING -->
+    <section class="station" id="s5">
+      <div class="ghost-num">05</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 05 — Nutrient Match · Puzzle</span><h2>Match Each Nutrient to Its Job</h2></div>
+      </div>
+      <p class="intro">Select one nutrient, then its matching function. Correct pairs lock in green.</p>
+      <div class="match-wrap">
+        <div class="match-col" id="matchLeft"></div>
+        <div class="match-col" id="matchRight"></div>
+      </div>
+      <div class="sorter-actions">
+        <button class="btn ghost" id="matchReset">Reset</button>
+        <span class="sorter-score mono" id="matchScore">0 / 6 matched</span>
+      </div>
+    </section>
+
+    <!-- STATION 06: SORTER PUZZLE 3 -->
+    <section class="station" id="s6">
+      <div class="ghost-num">06</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 06 — Function Sort · Puzzle</span><h2>Energy, Body-Building, or Protective?</h2></div>
+      </div>
+      <p class="intro">Foods classified by the role they play in the body.</p>
+      <div id="sorter3"></div>
+    </section>
+
+    <!-- STATION 07 -->
+    <section class="station" id="s7">
+      <div class="ghost-num">07</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 07 — Field Guide</span><h2>What Food Science Actually Studies</h2></div>
+      </div>
+      <p class="intro">A multidisciplinary field spanning production to consumption — six core areas.</p>
+      <div class="grid cols-3">
+        <div class="card"><h3>Food Chemistry</h3><p>Composition &amp; changes during processing/storage.</p></div>
+        <div class="card"><h3>Food Engineering</h3><p>Engineering applied to production, packaging, storage.</p></div>
+        <div class="card"><h3>Microbiology &amp; Safety</h3><p>Preventing foodborne illness.</p></div>
+        <div class="card"><h3>Food Processing</h3><p>Turning raw materials into safe, convenient products.</p></div>
+        <div class="card"><h3>Sensory Analysis</h3><p>Taste, aroma, texture, color, appearance.</p></div>
+        <div class="card"><h3>Product Development</h3><p>Designing new products for consumer needs.</p></div>
+      </div>
+      <div class="instrument amber" style="margin-top:16px; max-width:640px;">
+        <span class="k">Objectives</span>
+        <span class="v">Safety · Quality · Nutrient preservation · Shelf life · Innovation · Less waste</span>
+      </div>
+    </section>
+
+    <!-- STATION 08: GAP FILL -->
+    <section class="station" id="s8">
+      <div class="ghost-num">08</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 08 — Gap-Fill · Quiz</span><h2>Complete the Processing Notes</h2></div>
+      </div>
+      <p class="intro">Pick the correct word for each blank, then check your work.</p>
+      <div class="gapfill card">
+        <p id="gapParagraph"></p>
+        <div class="sorter-actions">
+          <button class="btn" id="gapCheck">Check answers</button>
+          <button class="btn ghost" id="gapReset">Reset</button>
+          <span class="sorter-score mono" id="gapScore"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATION 09: SORTER PUZZLE 4 -->
+    <section class="station" id="s9">
+      <div class="ghost-num">09</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 09 — Processing Sort · Puzzle</span><h2>Minimally, Moderately, or Ultra-Processed?</h2></div>
+      </div>
+      <p class="intro">The more steps and additives, the further right on the shelf-life-vs-nutrition trade-off.</p>
+      <div id="sorter4"></div>
+    </section>
+
+    <!-- STATION 10: BLANCHING LAB -->
+    <section class="station" id="s10">
+      <div class="ghost-num">10</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 10 — Blanching Lab · Signature Instrument</span><h2>Run the Enzyme Activity Simulator</h2></div>
+      </div>
+      <p class="intro">Blanching is a mild heat treatment that inactivates the enzymes that spoil color, flavor, and texture during storage. Drag the temperature and watch enzyme activity respond.</p>
+
+      <div class="sim">
+        <div>
+          <h3>Enzyme Activity Monitor</h3>
+          <input type="range" min="0" max="100" value="37" id="tempRange">
+          <div class="sim-readout"><span id="tempVal">37</span>°C</div>
+          <div class="sim-status" id="simStatus"></div>
+          <div class="sim-gauge"><div class="sim-gauge-fill" id="gaugeFill"></div></div>
+          <div class="sim-legend"><span>0% activity</span><span>100% activity</span></div>
+
+          <div class="sim-time-btns">
+            <button data-size="small" class="active" id="btnSmall">Small vegetables</button>
+            <button data-size="large" id="btnLarge">Large vegetables</button>
+          </div>
+          <div class="instrument amber" style="margin-top:12px;">
+            <span class="k">Recommended blanch time</span>
+            <span class="v" id="timeReadout">2–3 minutes</span>
+          </div>
+        </div>
+        <div>
+          <h3>Enzymes on the Bench</h3>
+          <div class="sim-enzymes">
+            <div class="row"><span>Polyphenol Oxidase</span><span>Browning (apple, potato, banana)</span></div>
+            <div class="row"><span>Chlorophyllase</span><span>Fades green (spinach, peas)</span></div>
+            <div class="row"><span>Lipoxygenase</span><span>Off-flavor (soybean, corn)</span></div>
+            <div class="row"><span>Polygalacturonase</span><span>Softens fruit (tomato)</span></div>
+            <div class="row"><span>Peroxidase</span><span>Color &amp; flavor loss (most produce)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid cols-2" style="margin-top:24px;">
+        <div class="card">
+          <span class="label">Method</span><h3>Hot Water Blanching</h3>
+          <p><strong>85–100°C</strong> immersion. Simple, low-cost — but leaches water-soluble vitamins and creates wastewater.</p>
+        </div>
+        <div class="card">
+          <span class="label">Method</span><h3>Steam Blanching</h3>
+          <p>Better vitamin retention and flavor, no wastewater — but needs pricier equipment and more time.</p>
+        </div>
+      </div>
+
+      <h3 style="font-size:14px; margin:32px 0 10px;">Rearrange Puzzle — Put the Blanching Process in Order</h3>
+      <p class="intro" style="margin-bottom:14px;">Use the arrows to reorder the steps, then check.</p>
+      <ol class="reorder-list" id="reorderList"></ol>
+      <div class="sorter-actions">
+        <button class="btn" id="reorderCheck">Check order</button>
+        <button class="btn ghost" id="reorderShuffle">Shuffle again</button>
+        <span class="sorter-score mono" id="reorderScore"></span>
+      </div>
+    </section>
+
+    <!-- STATION 11: FINAL QUIZ -->
+    <section class="station" id="s11" style="border-bottom:none;">
+      <div class="ghost-num">11</div>
+      <div class="stationhead">
+        <div><span class="kicker">Station 11 — Field Notes</span><h2>Quick Revision</h2></div>
+      </div>
+      <div class="grid cols-3" style="margin-bottom:30px;">
+        <div class="card"><h3>Food Science</h3><p>Studies composition, safety, processing, and quality.</p></div>
+        <div class="card"><h3>Food Processing</h3><p>Converts raw materials into safe, usable products.</p></div>
+        <div class="card"><h3>Blanching</h3><p>Mild heat treatment before preservation that inactivates enzymes.</p></div>
+      </div>
+      <div class="instrument" style="max-width:640px; margin-bottom:30px;">
+        <span class="k">Future trends</span>
+        <span class="v">Sustainable packaging · Plant-based foods · AI in the food industry</span>
+      </div>
+
+      <h3 style="font-size:14px; margin:0 0 14px;">Final Check — 3 Questions</h3>
+      <div id="finalQuiz"></div>
+      <div class="sorter-actions">
+        <button class="btn" id="quizCheck">Check answers</button>
+        <span class="sorter-score mono" id="quizScore"></span>
+      </div>
+    </section>
+
+    <footer>Built from a Food Science reference sheet · a practical bench, not a substitute for a lab coat.</footer>
+  </main>
+</div>
+
+<script>
+/* ============ GENERIC SORTER PUZZLE ============ */
+function buildSorter(containerId, items, bins){
+  const root = document.getElementById(containerId);
+  root.innerHTML = '';
+  const pool = document.createElement('div');
+  pool.className = 'sorter-pool';
+  root.appendChild(pool);
+
+  const binsWrap = document.createElement('div');
+  binsWrap.className = 'bins n3';
+  root.appendChild(binsWrap);
+
+  const binZones = {};
+  bins.forEach(b=>{
+    const el = document.createElement('div');
+    el.className = 'bin';
+    el.innerHTML = `<h4>${b.label}</h4><div class="zone" data-bin="${b.id}"></div>`;
+    binsWrap.appendChild(el);
+    binZones[b.id] = el.querySelector('.zone');
+  });
+
+  let selected = null;
+  const chips = {};
+
+  function makeChip(item){
+    const c = document.createElement('button');
+    c.className = 'chip';
+    c.type = 'button';
+    c.textContent = item.label;
+    c.dataset.id = item.id;
+    c.addEventListener('click', ()=>{
+      if(c.classList.contains('correct')) return;
+      if(selected === c){ c.classList.remove('selected'); selected=null; return; }
+      if(selected) selected.classList.remove('selected');
+      selected = c; c.classList.add('selected');
+    });
+    return c;
+  }
+
+  items.forEach(item=>{
+    const chip = makeChip(item);
+    chips[item.id] = chip;
+    pool.appendChild(chip);
+  });
+
+  bins.forEach(b=>{
+    binZones[b.id].addEventListener('click', ()=>{
+      if(!selected) return;
+      selected.classList.remove('selected');
+      binZones[b.id].appendChild(selected);
+      selected.dataset.placedBin = b.id;
+      selected = null;
+    });
+  });
+  pool.addEventListener('click', (e)=>{
+    if(e.target === pool && selected){
+      pool.appendChild(selected);
+      delete selected.dataset.placedBin;
+      selected.classList.remove('selected');
+      selected = null;
+    }
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'sorter-actions';
+  actions.innerHTML = `<button class="btn" data-act="check">Check</button>
+    <button class="btn ghost" data-act="reset">Reset</button>
+    <span class="sorter-score mono" data-act="score"></span>`;
+  root.appendChild(actions);
+  const scoreEl = actions.querySelector('[data-act="score"]');
+
+  actions.querySelector('[data-act="check"]').addEventListener('click', ()=>{
+    let correct = 0, placed = 0;
+    items.forEach(item=>{
+      const chip = chips[item.id];
+      const placedBin = chip.dataset.placedBin;
+      if(placedBin){
+        placed++;
+        chip.classList.remove('incorrect','correct');
+        if(placedBin === item.correctBin){ chip.classList.add('correct'); correct++; }
+        else chip.classList.add('incorrect');
+      }
+    });
+    scoreEl.textContent = `${correct} / ${items.length} correct (${placed} placed)`;
+  });
+
+  actions.querySelector('[data-act="reset"]').addEventListener('click', ()=>{
+    items.forEach(item=>{
+      const chip = chips[item.id];
+      chip.classList.remove('correct','incorrect','selected');
+      delete chip.dataset.placedBin;
+      pool.appendChild(chip);
+    });
+    selected = null;
+    scoreEl.textContent = '';
+  });
+}
+
+buildSorter('sorter1',
+  [
+    {id:'milk',label:'Milk',correctBin:'perishable'},
+    {id:'meat',label:'Meat',correctBin:'perishable'},
+    {id:'fish',label:'Fish',correctBin:'perishable'},
+    {id:'leafy',label:'Leafy Vegetables',correctBin:'perishable'},
+    {id:'potato',label:'Potato',correctBin:'semi'},
+    {id:'onion',label:'Onion',correctBin:'semi'},
+    {id:'root',label:'Root Vegetables',correctBin:'semi'},
+    {id:'cereal',label:'Cereals',correctBin:'non'},
+    {id:'pulses',label:'Pulses',correctBin:'non'},
+    {id:'nuts',label:'Nuts',correctBin:'non'},
+    {id:'canned',label:'Canned Foods',correctBin:'non'},
+  ],
+  [
+    {id:'perishable',label:'Perishable'},
+    {id:'semi',label:'Semi-Perishable'},
+    {id:'non',label:'Non-Perishable'},
+  ]
+);
+
+buildSorter('sorter2',
+  [
+    {id:'meat2',label:'Meat',correctBin:'acidic'},
+    {id:'fish2',label:'Fish',correctBin:'acidic'},
+    {id:'milkp',label:'Milk Products',correctBin:'acidic'},
+    {id:'fats',label:'Fats',correctBin:'neutral'},
+    {id:'sugar',label:'Sugar',correctBin:'neutral'},
+    {id:'fruits',label:'Fruits',correctBin:'alkaline'},
+    {id:'veg',label:'Vegetables',correctBin:'alkaline'},
+  ],
+  [
+    {id:'acidic',label:'Acidic'},
+    {id:'neutral',label:'Neutral'},
+    {id:'alkaline',label:'Alkaline'},
+  ]
+);
+
+buildSorter('sorter3',
+  [
+    {id:'rice',label:'Rice',correctBin:'energy'},
+    {id:'bread',label:'Bread',correctBin:'energy'},
+    {id:'potato3',label:'Potato',correctBin:'energy'},
+    {id:'oil',label:'Cooking Oil',correctBin:'energy'},
+    {id:'fish3',label:'Fish',correctBin:'body'},
+    {id:'eggs',label:'Eggs',correctBin:'body'},
+    {id:'beans',label:'Beans',correctBin:'body'},
+    {id:'lentils',label:'Lentils',correctBin:'body'},
+    {id:'fruits3',label:'Fruits',correctBin:'protective'},
+    {id:'veg3',label:'Vegetables',correctBin:'protective'},
+    {id:'greens',label:'Leafy Greens',correctBin:'protective'},
+  ],
+  [
+    {id:'energy',label:'Energy-Yielding'},
+    {id:'body',label:'Body-Building'},
+    {id:'protective',label:'Protective'},
+  ]
+);
+
+buildSorter('sorter4',
+  [
+    {id:'freshfruit',label:'Fresh Fruits',correctBin:'min'},
+    {id:'frozenveg',label:'Frozen Vegetables',correctBin:'min'},
+    {id:'driedfruit',label:'Dried Fruits',correctBin:'min'},
+    {id:'pastmilk',label:'Pasteurized Milk',correctBin:'min'},
+    {id:'bread4',label:'Bread',correctBin:'mod'},
+    {id:'cheese',label:'Cheese',correctBin:'mod'},
+    {id:'cannedfish',label:'Canned Fish',correctBin:'mod'},
+    {id:'flavmilk',label:'Flavored Milk',correctBin:'mod'},
+    {id:'softdrink',label:'Soft Drinks',correctBin:'ultra'},
+    {id:'chips',label:'Potato Chips',correctBin:'ultra'},
+    {id:'noodles',label:'Instant Noodles',correctBin:'ultra'},
+    {id:'nuggets',label:'Chicken Nuggets',correctBin:'ultra'},
+  ],
+  [
+    {id:'min',label:'Minimally Processed'},
+    {id:'mod',label:'Moderately Processed'},
+    {id:'ultra',label:'Ultra-Processed'},
+  ]
+);
+
+/* ============ MATCHING GAME ============ */
+const pairs = [
+  {id:'carb', a:'Carbohydrates', b:'Main source of energy'},
+  {id:'prot', a:'Protein', b:'Growth and tissue repair'},
+  {id:'fat', a:'Fat', b:'Energy storage and insulation'},
+  {id:'vit', a:'Vitamins', b:'Regulation of body processes'},
+  {id:'min', a:'Minerals', b:'Support normal body functions'},
+  {id:'water', a:'Water', b:'Hydration and transport of nutrients'},
+];
+(function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} })(pairs);
+const leftOrder = [...pairs];
+const rightOrder = [...pairs].sort(()=>Math.random()-0.5);
+
+const matchLeft = document.getElementById('matchLeft');
+const matchRight = document.getElementById('matchRight');
+const matchScoreEl = document.getElementById('matchScore');
+let selA = null, selB = null, matched = 0;
+
+function buildMatch(){
+  matchLeft.innerHTML=''; matchRight.innerHTML='';
+  selA=null; selB=null; matched=0;
+  matchScoreEl.textContent = '0 / 6 matched';
+  leftOrder.forEach(p=>{
+    const b = document.createElement('button');
+    b.className='match-item'; b.textContent=p.a; b.dataset.id=p.id; b.type='button';
+    b.addEventListener('click',()=>{
+      if(b.classList.contains('locked')) return;
+      document.querySelectorAll('#matchLeft .match-item').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected'); selA = b;
+      tryMatch();
+    });
+    matchLeft.appendChild(b);
+  });
+  rightOrder.forEach(p=>{
+    const b = document.createElement('button');
+    b.className='match-item'; b.textContent=p.b; b.dataset.id=p.id; b.type='button';
+    b.addEventListener('click',()=>{
+      if(b.classList.contains('locked')) return;
+      document.querySelectorAll('#matchRight .match-item').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected'); selB = b;
+      tryMatch();
+    });
+    matchRight.appendChild(b);
+  });
+}
+function tryMatch(){
+  if(!selA || !selB) return;
+  if(selA.dataset.id === selB.dataset.id){
+    selA.classList.remove('selected'); selB.classList.remove('selected');
+    selA.classList.add('locked'); selB.classList.add('locked');
+    matched++;
+    matchScoreEl.textContent = `${matched} / 6 matched`;
+  } else {
+    selA.classList.add('wrong'); selB.classList.add('wrong');
+    setTimeout(()=>{
+      selA.classList.remove('selected','wrong');
+      selB.classList.remove('selected','wrong');
+      selA=null; selB=null;
+    }, 450);
+    return;
+  }
+  selA=null; selB=null;
+}
+document.getElementById('matchReset').addEventListener('click', buildMatch);
+buildMatch();
+
+/* ============ GAP FILL QUIZ ============ */
+const gapAnswers = ['biological','Primary','Secondary','Thermal','Ultra-processed'];
+const gapOptions = [
+  ['physical','chemical','biological'],
+  ['Primary','Secondary','Tertiary'],
+  ['Primary','Secondary','Minimal'],
+  ['Chemical','Thermal','Biological'],
+  ['Moderately processed','Ultra-processed','Minimally processed'],
+];
+const gapTemplate = [
+  'Food processing is the conversion of raw agricultural materials into safe, nutritious, and marketable food products using physical, chemical, or ',
+  ' methods. ',
+  ' processing involves simple operations like milling wheat into flour, while ',
+  ' processing transforms ingredients into ready-to-eat products like bread and biscuits. ',
+  ' processing uses heat to destroy microorganisms, such as pasteurization. ',
+  ' foods are industrially manufactured with additives, artificial flavors, and preservatives, and are usually high in sugar, salt, and unhealthy fats.'
+];
+function buildGap(){
+  const p = document.getElementById('gapParagraph');
+  p.innerHTML = '';
+  gapTemplate.forEach((text, i)=>{
+    p.appendChild(document.createTextNode(text));
+    if(i < gapAnswers.length){
+      const sel = document.createElement('select');
+      sel.className = 'blank';
+      sel.dataset.idx = i;
+      const blankOpt = document.createElement('option');
+      blankOpt.textContent = '— choose —'; blankOpt.value=''; sel.appendChild(blankOpt);
+      gapOptions[i].forEach(opt=>{
+        const o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        sel.appendChild(o);
+      });
+      p.appendChild(sel);
+    }
+  });
+  document.getElementById('gapScore').textContent = '';
+}
+buildGap();
+document.getElementById('gapCheck').addEventListener('click', ()=>{
+  const selects = document.querySelectorAll('#gapParagraph select');
+  let correct = 0;
+  selects.forEach(sel=>{
+    const idx = +sel.dataset.idx;
+    sel.classList.remove('correct','incorrect');
+    if(sel.value === gapAnswers[idx]){ sel.classList.add('correct'); correct++; }
+    else sel.classList.add('incorrect');
+  });
+  document.getElementById('gapScore').textContent = `${correct} / ${gapAnswers.length} correct`;
+});
+document.getElementById('gapReset').addEventListener('click', buildGap);
+
+/* ============ REORDER PUZZLE ============ */
+const correctSteps = [
+  'Heat water to the required temperature.',
+  'Add salt if necessary.',
+  'Place cleaned vegetables into hot water or steam.',
+  'Blanch for the recommended time.',
+  'Remove immediately.',
+  'Cool rapidly in ice water.',
+  'Drain excess water.',
+  'Package properly.',
+  'Store under suitable conditions.'
+];
+let currentSteps = [];
+function shuffleSteps(){
+  currentSteps = [...correctSteps];
+  for(let i=currentSteps.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [currentSteps[i],currentSteps[j]] = [currentSteps[j],currentSteps[i]];
+  }
+  renderReorder();
+}
+function renderReorder(){
+  const list = document.getElementById('reorderList');
+  list.innerHTML = '';
+  currentSteps.forEach((step, i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="step-idx mono">${i+1}</span><span>${step}</span>
+      <span class="arrows">
+        <button data-dir="up" aria-label="Move up">▲</button>
+        <button data-dir="down" aria-label="Move down">▼</button>
+      </span>`;
+    li.querySelector('[data-dir="up"]').addEventListener('click', ()=>{
+      if(i>0){ [currentSteps[i-1],currentSteps[i]] = [currentSteps[i],currentSteps[i-1]]; renderReorder(); }
+    });
+    li.querySelector('[data-dir="down"]').addEventListener('click', ()=>{
+      if(i<currentSteps.length-1){ [currentSteps[i+1],currentSteps[i]] = [currentSteps[i],currentSteps[i+1]]; renderReorder(); }
+    });
+    list.appendChild(li);
+  });
+  document.getElementById('reorderScore').textContent = '';
+}
+document.getElementById('reorderCheck').addEventListener('click', ()=>{
+  const items = document.querySelectorAll('#reorderList li');
+  let correct = 0;
+  items.forEach((li,i)=>{
+    li.classList.remove('correct','incorrect');
+    if(currentSteps[i] === correctSteps[i]){ li.classList.add('correct'); correct++; }
+    else li.classList.add('incorrect');
+  });
+  document.getElementById('reorderScore').textContent = `${correct} / ${correctSteps.length} in place`;
+});
+document.getElementById('reorderShuffle').addEventListener('click', shuffleSteps);
+shuffleSteps();
+
+/* ============ BLANCHING SIMULATOR ============ */
+const tempRange = document.getElementById('tempRange');
+const tempVal = document.getElementById('tempVal');
+const simStatus = document.getElementById('simStatus');
+const gaugeFill = document.getElementById('gaugeFill');
+
+function activityForTemp(t){
+  let a;
+  if(t <= 37) a = (t/37)*100;
+  else if(t <= 60) a = 100 - ((t-37)/(60-37))*40;
+  else if(t <= 80) a = 60 - ((t-60)/20)*55;
+  else a = Math.max(0, 5 - (t-80)*0.25);
+  return Math.round(a);
+}
+function updateSim(){
+  const t = +tempRange.value;
+  tempVal.textContent = t;
+  const a = activityForTemp(t);
+  gaugeFill.style.width = a + '%';
+  let status;
+  if(t >= 33 && t <= 41) status = 'Maximum enzyme activity — worst point for storage';
+  else if(a > 60) status = 'Enzymes active — quality declining';
+  else if(a > 10) status = 'Enzyme activity slowing';
+  else status = 'Enzymes inactivated — safe to preserve';
+  simStatus.textContent = status;
+}
+tempRange.addEventListener('input', updateSim);
+updateSim();
+
+const btnSmall = document.getElementById('btnSmall');
+const btnLarge = document.getElementById('btnLarge');
+const timeReadout = document.getElementById('timeReadout');
+btnSmall.addEventListener('click', ()=>{
+  btnSmall.classList.add('active'); btnLarge.classList.remove('active');
+  timeReadout.textContent = '2–3 minutes';
+});
+btnLarge.addEventListener('click', ()=>{
+  btnLarge.classList.add('active'); btnSmall.classList.remove('active');
+  timeReadout.textContent = '4–5 minutes';
+});
+
+/* ============ FINAL QUIZ ============ */
+const finalQ = [
+  {q:'At what temperature do most enzymes become inactive?', opts:['37°C','60°C','80°C'], correct:'80°C'},
+  {q:'Which blanching method retains more water-soluble vitamins?', opts:['Hot water blanching','Steam blanching'], correct:'Steam blanching'},
+  {q:'Blanching mainly works by inactivating which of these?', opts:['Bacteria','Enzymes','Fungi'], correct:'Enzymes'},
+];
+const finalQuizRoot = document.getElementById('finalQuiz');
+finalQ.forEach((item,qi)=>{
+  const div = document.createElement('div');
+  div.className = 'quiz-q';
+  div.innerHTML = `<p>${qi+1}. ${item.q}</p><div class="quiz-opts" data-qi="${qi}"></div>`;
+  const optsWrap = div.querySelector('.quiz-opts');
+  item.opts.forEach(opt=>{
+    const b = document.createElement('button');
+    b.className = 'quiz-opt'; b.type='button'; b.textContent = opt;
+    b.addEventListener('click', ()=>{
+      optsWrap.querySelectorAll('.quiz-opt').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+    });
+    optsWrap.appendChild(b);
+  });
+  finalQuizRoot.appendChild(div);
+});
+document.getElementById('quizCheck').addEventListener('click', ()=>{
+  let correct = 0;
+  finalQ.forEach((item,qi)=>{
+    const wrap = document.querySelector(`.quiz-opts[data-qi="${qi}"]`);
+    const sel = wrap.querySelector('.selected');
+    wrap.querySelectorAll('.quiz-opt').forEach(b=>{
+      b.classList.remove('correct','incorrect');
+      if(b.textContent === item.correct) b.classList.add('correct');
+    });
+    if(sel && sel.textContent === item.correct) correct++;
+    else if(sel) sel.classList.add('incorrect');
+  });
+  document.getElementById('quizScore').textContent = `${correct} / ${finalQ.length} correct`;
+});
+</script>
+</body>
+</html>

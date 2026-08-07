@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lab Report - Varendra University</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #e5e5e5;
+    font-family: "Times New Roman", Times, serif;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 10mm auto;
+    background: #ffffff;
+    padding: 15mm;
+    position: relative;
+    box-shadow: 0 0 8px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- HEADER ---------- */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo-box {
+    width: 110px;
+    flex: 0 0 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-box img {
+    max-width: 110px;
+    max-height: 110px;
+    display: block;
+    cursor: pointer;
+  }
+  .logo-box.right img {
+    max-width: 90px;
+    max-height: 120px;
+  }
+  .logo-box.right {
+    flex: 0 0 110px;
+    justify-content: center;
+  }
+  .header-text {
+    flex: 1;
+    text-align: center;
+  }
+  .header-text .uni-name {
+    font-size: 24px;
+    font-weight: normal;
+    margin: 0 0 6px 0;
+  }
+  .header-text .program-line {
+    font-size: 16px;
+    margin: 0 0 6px 0;
+  }
+  .header-text .dept-line {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .title-block {
+    text-align: center;
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+  .title-block .lab-report-title {
+    font-size: 34px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    display: inline-block;
+    outline: none;
+  }
+
+  /* ---------- COURSE FIELDS ---------- */
+  .course-fields {
+    margin-left: 60px;
+    margin-bottom: 50px;
+  }
+  .field-line {
+    font-size: 17px;
+    margin-bottom: 26px;
+    display: flex;
+  }
+  .field-line .label {
+    white-space: nowrap;
+    margin-right: 6px;
+  }
+  .field-line .fill {
+    flex: 1;
+    outline: none;
+    min-width: 50px;
+    border-bottom: none;
+  }
+
+  /* ---------- TABLE ---------- */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 16px;
+  }
+  .info-table td {
+    border: 1px solid #000;
+    vertical-align: top;
+    padding: 16px 18px;
+    width: 50%;
+  }
+  .info-table .table-head {
+    text-align: center;
+    padding: 16px 18px;
+    height: 46px;
+    font-size: 17px;
+  }
+  .info-table .table-body {
+    height: 320px;
+  }
+  .row-line {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: baseline;
+  }
+  .row-line .label {
+    font-weight: bold;
+    white-space: nowrap;
+    margin-right: 6px;
+    flex: 0 0 auto;
+  }
+  .row-line .fill {
+    flex: 1;
+    outline: none;
+    min-width: 30px;
+  }
+  .static-line {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: baseline;
+  }
+  .static-line .label {
+    font-weight: bold;
+    white-space: nowrap;
+    margin-right: 6px;
+    flex: 0 0 auto;
+  }
+  .static-line .fill {
+    flex: 1;
+    outline: none;
+    min-width: 30px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer {
+    margin-top: auto;
+    padding-top: 120px;
+    text-align: right;
+  }
+  .footer .sig {
+    display: inline-block;
+    text-decoration: underline;
+    font-size: 16px;
+    outline: none;
+    padding-bottom: 2px;
+  }
+
+  [contenteditable="true"]:hover,
+  input:hover {
+    background: rgba(255, 230, 150, 0.25);
+  }
+  [contenteditable="true"]:focus,
+  input:focus {
+    background: rgba(255, 230, 150, 0.4);
+  }
+
+  input {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 14px;
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+  }
+
+  .logo-hint {
+    position: absolute;
+    font-size: 8px;
+    color: #999;
+    text-align: center;
+    width: 100px;
+    display: none;
+  }
+
+  /* ---------- PRINT ---------- */
+  @media print {
+    html, body {
+      background: #ffffff;
+      height: 100%;
+    }
+    .page {
+      margin: 0;
+      box-shadow: none;
+      width: auto;
+      min-height: 267mm;
+      height: 267mm;
+      padding: 0;
+    }
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+    .no-print {
+      display: none !important;
+    }
+    [contenteditable="true"]:hover,
+    input:hover,
+    [contenteditable="true"]:focus,
+    input:focus {
+      background: transparent;
+    }
+  }
+
+  .toolbar {
+    max-width: 210mm;
+    margin: 8mm auto 0 auto;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #555;
+  }
+  .toolbar button {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    padding: 6px 14px;
+    margin: 0 4px;
+    cursor: pointer;
+    border: 1px solid #888;
+    background: #fff;
+    border-radius: 4px;
+  }
+  .toolbar button:hover {
+    background: #f0f0f0;
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar no-print">
+  Click either logo to replace it with your own image<br>
+  <button onclick="window.print()">🖨️ Print / Save as PDF</button>
+  <button onclick="saveBackup()">💾 Save Backup (.nfe)</button>
+  <button onclick="document.getElementById('backupLoadInput').click()">📂 Load Backup (.nfe)</button>
+  <button onclick="clearAutoSave()">🗑️ Clear Saved Data</button>
+  <input type="file" id="backupLoadInput" accept=".nfe" style="display:none;">
+  <span id="backupStatus" style="margin-left:8px;color:#2a7a2a;"></span>
+  <div style="margin-top:4px;font-size:11px;color:#777;">এই ব্রাউজারে আপনার তথ্য অটো-সেভ থাকে (পেজ বন্ধ করলেও হারাবে না)</div>
+</div>
+
+<div class="page" id="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-box left" title="Click to replace logo">
+      <img id="leftLogo" src="nfelogo.png" alt="Nutrition and Food Engineering Logo">
+      <input type="file" id="leftLogoInput" accept="image/*" style="display:none;">
+    </div>
+
+    <div class="header-text">
+      <div class="uni-name" contenteditable="true" data-key="uniName">Varendra University</div>
+      <div class="program-line" contenteditable="true" data-key="programLine">B.Sc. in Nutrition and Food Engineering Program</div>
+      <div class="dept-line" contenteditable="true" data-key="deptLine">Department of Public Health</div>
+    </div>
+
+    <div class="logo-box right" title="Click to replace logo">
+      <img id="rightLogo" src="vulogo.png" alt="Varendra University Logo">
+      <input type="file" id="rightLogoInput" accept="image/*" style="display:none;">
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div class="title-block">
+    <span class="lab-report-title" contenteditable="true" data-key="title">Lab&nbsp;&nbsp;Report</span>
+  </div>
+
+  <!-- COURSE FIELDS -->
+  <div class="course-fields">
+    <div class="field-line">
+      <span class="label">Course Code:</span>
+      <span class="fill" contenteditable="true" data-key="courseCode"></span>
+    </div>
+    <div class="field-line">
+      <span class="label">Course Title:</span>
+      <span class="fill" contenteditable="true" data-key="courseTitle"></span>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <table class="info-table">
+    <tr>
+      <td class="table-head" contenteditable="true" data-key="subByHead">Submitted By</td>
+      <td class="table-head" contenteditable="true" data-key="subToHead">Submitted To</td>
+    </tr>
+    <tr>
+      <td class="table-body">
+        <div class="row-line"><span class="label">Name:</span><span class="fill" contenteditable="true" data-key="byName"></span></div>
+        <div class="row-line"><span class="label">ID:</span><span class="fill" contenteditable="true" data-key="byId"></span></div>
+        <div class="row-line"><span class="label">Batch:</span><span class="fill" contenteditable="true" data-key="byBatch"></span></div>
+        <div class="row-line"><span class="label">Semester:</span><span class="fill" contenteditable="true" data-key="bySemester"></span></div>
+        <div class="static-line"><span class="label">Program:</span><span class="fill" contenteditable="true" data-key="byProgram">B. Sc. in Nutrition and Food Engineering</span></div>
+        <div class="static-line"><span class="label">Department:</span><span class="fill" contenteditable="true" data-key="byDept">Public Health</span></div>
+      </td>
+      <td class="table-body">
+        <div class="row-line"><span class="label">Name:</span><span class="fill" contenteditable="true" data-key="toName"></span></div>
+        <div class="row-line"><span class="label">Designation:</span><span class="fill" contenteditable="true" data-key="toDesignation"></span></div>
+        <div class="static-line"><span class="label">Department:</span><span class="fill" contenteditable="true" data-key="toDept">Public Health</span></div>
+        <div class="static-line" contenteditable="true" data-key="toUni">Varendra University</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span class="sig" contenteditable="true" data-key="signature">Signature of Course Teacher</span>
+  </div>
+
+</div>
+
+<script>
+  function setupLogoReplace(imgId, inputId) {
+    var img = document.getElementById(imgId);
+    var input = document.getElementById(inputId);
+
+    img.addEventListener('click', function () {
+      input.click();
+    });
+
+    input.addEventListener('change', function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (evt) {
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  setupLogoReplace('leftLogo', 'leftLogoInput');
+  setupLogoReplace('rightLogo', 'rightLogoInput');
+
+  /* ---------- AUTO-SAVE TO LOCAL STORAGE ---------- */
+
+  var LS_KEY = "nfe-lab-report-autosave";
+  var autoSaveTimer = null;
+
+  function autoSaveNow() {
+    try {
+      var data = collectData();
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+    } catch (err) {
+      console.error("Auto-save failed:", err);
+    }
+  }
+
+  function scheduleAutoSave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(autoSaveNow, 500);
+  }
+
+  function autoLoad() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      applyData(data);
+    } catch (err) {
+      console.error("Auto-load failed:", err);
+    }
+  }
+
+  function clearAutoSave() {
+    try {
+      localStorage.removeItem(LS_KEY);
+      showStatus("Saved data cleared ✓", false);
+    } catch (err) {
+      showStatus("Clear failed: " + err.message, true);
+    }
+  }
+
+  // Load any previously saved data as soon as the page opens
+  window.addEventListener('DOMContentLoaded', autoLoad);
+
+  // Save whenever any editable field changes
+  document.querySelectorAll('[data-key]').forEach(function (el) {
+    el.addEventListener('input', scheduleAutoSave);
+  });
+
+  // Save whenever a logo is replaced
+  document.getElementById('leftLogoInput').addEventListener('change', function () {
+    setTimeout(autoSaveNow, 300);
+  });
+  document.getElementById('rightLogoInput').addEventListener('change', function () {
+    setTimeout(autoSaveNow, 300);
+  });
+
+  /* ---------- BACKUP (.nfe) SAVE / LOAD ---------- */
+
+  function showStatus(msg, isError) {
+    var el = document.getElementById('backupStatus');
+    el.style.color = isError ? '#b02a2a' : '#2a7a2a';
+    el.textContent = msg;
+    setTimeout(function () { el.textContent = ''; }, 4000);
+  }
+
+  function collectData() {
+    var data = { type: "nfe-lab-report-backup", version: 1, savedAt: new Date().toISOString(), fields: {}, logos: {} };
+
+    document.querySelectorAll('[data-key]').forEach(function (el) {
+      data.fields[el.getAttribute('data-key')] = el.innerHTML;
+    });
+
+    data.logos.left = document.getElementById('leftLogo').src;
+    data.logos.right = document.getElementById('rightLogo').src;
+
+    return data;
+  }
+
+  function saveBackup() {
+    try {
+      var data = collectData();
+      var json = JSON.stringify(data, null, 2);
+      var blob = new Blob([json], { type: "application/octet-stream" });
+      var url = URL.createObjectURL(blob);
+
+      var dateStr = new Date().toISOString().slice(0, 10);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = "lab-report-backup-" + dateStr + ".nfe";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showStatus("Backup saved ✓", false);
+    } catch (err) {
+      showStatus("Save failed: " + err.message, true);
+    }
+  }
+
+  function applyData(data) {
+    if (!data || data.type !== "nfe-lab-report-backup") {
+      throw new Error("Invalid .nfe backup file");
+    }
+
+    if (data.fields) {
+      Object.keys(data.fields).forEach(function (key) {
+        var el = document.querySelector('[data-key="' + key + '"]');
+        if (el) el.innerHTML = data.fields[key];
+      });
+    }
+
+    if (data.logos) {
+      if (data.logos.left) document.getElementById('leftLogo').src = data.logos.left;
+      if (data.logos.right) document.getElementById('rightLogo').src = data.logos.right;
+    }
+  }
+
+  function loadBackup(file) {
+    var reader = new FileReader();
+    reader.onload = function (evt) {
+      try {
+        var data = JSON.parse(evt.target.result);
+        applyData(data);
+        showStatus("Backup loaded ✓", false);
+      } catch (err) {
+        showStatus("Load failed: " + err.message, true);
+      }
+    };
+    reader.onerror = function () {
+      showStatus("Could not read file", true);
+    };
+    reader.readAsText(file);
+  }
+
+  document.getElementById('backupLoadInput').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    loadBackup(file);
+    e.target.value = "";
+  });
+</script>
+
+</body>
+</html>

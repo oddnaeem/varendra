@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Assignment Tracker</title>
+<meta name="description" content="A lightweight, offline-capable assignment tracker for students." />
+<meta name="theme-color" content="#3B5BFF" />
+
+<!-- PWA -->
+
+<!-- Fonts: Sora for display, Inter for body, IBM Plex Mono for dates/data -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+
+<style>
+/* =========================================================
+   DESIGN TOKENS
+   Palette: indigo-blue primary on a clean white "planner" surface.
+   Priority colors double as the app's only saturated accents.
+   ========================================================= */
+:root {
+  --primary: #3B5BFF;
+  --primary-dark: #2B44D6;
+  --primary-tint: #EEF1FF;
+
+  --bg: #FBFBFD;
+  --surface: #FFFFFF;
+  --surface-2: #F5F6FA;
+  --border: #E7E9F1;
+  --text: #1E2333;
+  --text-muted: #6B7280;
+
+  --success: #16A34A;
+  --success-tint: #E9F8EF;
+  --warning: #F59E0B;
+  --warning-tint: #FEF6E7;
+  --danger: #EF4444;
+  --danger-tint: #FDECEC;
+
+  --high: #EF4444;
+  --medium: #F59E0B;
+  --low: #16A34A;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+
+  --shadow-sm: 0 1px 2px rgba(24, 28, 47, 0.06), 0 1px 1px rgba(24, 28, 47, 0.04);
+  --shadow-md: 0 8px 24px rgba(24, 28, 47, 0.08);
+  --shadow-lg: 0 20px 48px rgba(24, 28, 47, 0.16);
+
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-theme="dark"] {
+  --primary: #6C86FF;
+  --primary-dark: #8CA0FF;
+  --primary-tint: #1C2140;
+
+  --bg: #0F1117;
+  --surface: #171A24;
+  --surface-2: #1D212C;
+  --border: #2B2F3D;
+  --text: #EAEBF3;
+  --text-muted: #9298AC;
+
+  --success-tint: #10261A;
+  --warning-tint: #2B2212;
+  --danger-tint: #2C1717;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+.hidden { display: none !important; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar__brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--surface);
+  flex-shrink: 0;
+}
+.topbar__brand h1 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.brand-sub { margin: 0; font-size: 11.5px; color: var(--text-muted); }
+.topbar__actions { display: flex; align-items: center; gap: 6px; }
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: background 0.15s var(--ease), transform 0.1s var(--ease);
+}
+.icon-btn:hover { background: var(--surface-2); }
+.icon-btn:active { transform: scale(0.94); }
+
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.sync-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+.sync-dot.online { background: var(--success); box-shadow: 0 0 0 3px var(--success-tint); }
+.sync-dot.offline { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-tint); }
+.sync-dot.syncing { background: var(--warning); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.menu-wrap { position: relative; }
+.menu {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  min-width: 190px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  animation: pop-in 0.15s var(--ease);
+}
+.menu button {
+  text-align: left;
+  padding: 9px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 13.5px;
+}
+.menu button:hover { background: var(--surface-2); }
+@keyframes pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+.app {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 20px 100px;
+}
+
+/* Dashboard */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.stat-num { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+.stat-label { font-size: 11.5px; color: var(--text-muted); }
+.stat-card--warn .stat-num { color: var(--danger); }
+.stat-card--today .stat-num { color: var(--warning); }
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--text-muted);
+}
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  width: 100%;
+}
+.filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: all 0.15s var(--ease);
+}
+.chip:hover { background: var(--surface-2); }
+.chip.is-active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.view-toggle {
+  display: inline-flex;
+  align-self: flex-start;
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+}
+.view-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.view-btn.is-active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+
+/* =========================================================
+   ASSIGNMENT LIST / CARDS
+   ========================================================= */
+.assignment-list { display: flex; flex-direction: column; gap: 10px; }
+
+.a-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 14px 14px 16px;
+  box-shadow: var(--shadow-sm);
+  animation: card-in 0.25s var(--ease);
+  border-left: 4px solid var(--low);
+}
+.a-card[data-priority="High"] { border-left-color: var(--high); }
+.a-card[data-priority="Medium"] { border-left-color: var(--medium); }
+.a-card[data-priority="Low"] { border-left-color: var(--low); }
+.a-card.is-completed { opacity: 0.6; }
+.a-card.is-overdue:not(.is-completed) { background: linear-gradient(0deg, var(--danger-tint), var(--danger-tint)), var(--surface); }
+
+@keyframes card-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.a-card__check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s var(--ease);
+  background: var(--surface);
+}
+.a-card__check svg { opacity: 0; transition: opacity 0.15s var(--ease); }
+.a-card.is-completed .a-card__check { background: var(--success); border-color: var(--success); }
+.a-card.is-completed .a-card__check svg { opacity: 1; }
+
+.a-card__body { flex: 1; min-width: 0; }
+.a-card__top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.a-card__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  word-break: break-word;
+}
+.a-card.is-completed .a-card__title { text-decoration: line-through; }
+.a-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.a-card__meta span { display: inline-flex; align-items: center; gap: 4px; }
+.a-card__desc { font-size: 13px; color: var(--text-muted); margin: 6px 0 0; }
+
+.badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.badge--high { color: var(--high); background: var(--danger-tint); }
+.badge--medium { color: var(--medium); background: var(--warning-tint); }
+.badge--low { color: var(--low); background: var(--success-tint); }
+.badge--overdue { color: var(--high); background: var(--danger-tint); }
+.badge--today { color: var(--medium); background: var(--warning-tint); }
+
+.a-card__due {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+}
+.a-card__due strong { display: block; color: var(--text); font-size: 13px; }
+
+.a-card__actions {
+  display: flex;
+  gap: 4px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.a-card__actions button {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+}
+.a-card__actions button:hover { background: var(--surface-2); color: var(--text); }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-state svg { margin-bottom: 10px; opacity: 0.5; }
+.empty-state p { font-size: 14px; max-width: 280px; margin: 0 auto; }
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+.calendar-view {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.calendar-header h2 { font-family: var(--font-display); font-size: 16px; margin: 0; }
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 6px 0 10px;
+}
+.cal-day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: var(--text);
+  border: 1px solid transparent;
+  background: transparent;
+}
+.cal-day.is-muted { color: var(--text-muted); opacity: 0.35; }
+.cal-day.is-today { border-color: var(--primary); font-weight: 700; }
+.cal-day.has-items { background: var(--surface-2); }
+.cal-day.is-selected { background: var(--primary); color: #fff; }
+.cal-day-dots { display: flex; gap: 2px; margin-top: 3px; height: 5px; }
+.cal-day-dots span { width: 4px; height: 4px; border-radius: 50%; }
+
+.calendar-day-panel { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+.calendar-day-panel__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.calendar-day-panel__header h3 { font-family: var(--font-display); font-size: 14px; margin: 0; }
+
+/* =========================================================
+   FLOATING ADD BUTTON
+   ========================================================= */
+.fab {
+  position: fixed;
+  right: 22px;
+  bottom: 26px;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-lg);
+  z-index: 30;
+  transition: transform 0.15s var(--ease), background 0.15s var(--ease);
+}
+.fab:hover { background: var(--primary-dark); transform: translateY(-2px) scale(1.03); }
+.fab:active { transform: scale(0.94); }
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  animation: fade-in 0.15s var(--ease);
+  backdrop-filter: blur(2px);
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--surface);
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: 22px 22px 0 0;
+  box-shadow: var(--shadow-lg);
+  animation: sheet-in 0.25s var(--ease);
+}
+@keyframes sheet-in { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@media (min-width: 640px) {
+  .modal-backdrop { align-items: center; }
+  .modal { border-radius: var(--radius-lg); margin: 20px; }
+}
+.modal--small { max-width: 380px; }
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+.modal__header h2 { font-family: var(--font-display); font-size: 16px; margin: 0; }
+.modal__body { padding: 18px 20px; }
+.modal__body--center { text-align: center; }
+.modal__body--center h2 { font-family: var(--font-display); font-size: 17px; margin: 4px 0 6px; }
+.modal__body--center p { color: var(--text-muted); font-size: 13.5px; margin: 0; }
+
+.form-row { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+.form-row.two-col { flex-direction: row; gap: 12px; }
+.form-row.two-col > div { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.form-row label { font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
+.req { color: var(--danger); }
+.optional { font-weight: 400; text-transform: none; color: var(--text-muted); }
+.form-row input[type="text"],
+.form-row input[type="date"],
+.form-row input[type="time"],
+.form-row input[type="number"],
+.form-row select,
+.form-row textarea {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s var(--ease);
+  width: 100%;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--primary); }
+.form-row textarea { resize: vertical; }
+.checkbox-row { flex-direction: row; align-items: center; }
+.checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text); font-weight: 500; }
+.checkbox-label input { width: 17px; height: 17px; accent-color: var(--primary); }
+
+.settings-hint { font-size: 12px; color: var(--text-muted); margin: 4px 0 16px; line-height: 1.5; }
+
+.modal__footer { display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px; }
+.modal__footer--center { justify-content: center; padding-top: 16px; }
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: transform 0.1s var(--ease), background 0.15s var(--ease);
+}
+.btn:active { transform: scale(0.96); }
+.btn--primary { background: var(--primary); color: #fff; }
+.btn--primary:hover { background: var(--primary-dark); }
+.btn--ghost { background: var(--surface-2); color: var(--text); }
+.btn--ghost:hover { background: var(--border); }
+.btn--danger { background: var(--danger); color: #fff; }
+.btn--danger:hover { background: #d43a3a; }
+
+/* =========================================================
+   TOASTS
+   ========================================================= */
+.toast-container {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+  width: min(92vw, 380px);
+}
+.toast {
+  background: var(--text);
+  color: var(--surface);
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+  animation: toast-in 0.2s var(--ease);
+  text-align: center;
+}
+.toast--error { background: var(--danger); }
+.toast--success { background: var(--success); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (min-width: 640px) {
+  .dashboard { grid-template-columns: repeat(6, 1fr); }
+  .toolbar { flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .search-box { flex: 1; min-width: 220px; }
+}
+@media (max-width: 639px) {
+  .topbar__brand h1 { font-size: 15px; }
+  .brand-sub { display: none; }
+  .form-row.two-col { flex-direction: column; }
+  .cal-day { font-size: 11px; }
+}
+
+/* Print styles */
+@media print {
+  .topbar, .toolbar, .dashboard, .fab, .toast-container, #calendarView, .a-card__actions, .a-card__check { display: none !important; }
+  body { background: #fff; color: #000; }
+  .a-card { break-inside: avoid; border: 1px solid #ccc; box-shadow: none; }
+}
+
+/* Focus visibility for a11y */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP BAR ===================== -->
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="3" fill="currentColor"/><rect x="8" y="1.5" width="8" height="4" rx="1.5" fill="var(--surface)"/><path d="M8 12.5l2.4 2.4L16 9" stroke="var(--surface)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <div>
+      <h1>Assignment Tracker</h1>
+      <p class="brand-sub">every due date, one page</p>
+    </div>
+  </div>
+
+  <div class="topbar__actions">
+    <span id="syncStatus" class="sync-pill" title="Sync status">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncLabel">Loading…</span>
+    </span>
+    <button id="notifBtn" class="icon-btn" title="Enable reminders" aria-label="Enable reminders">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 01-3.4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button id="darkModeBtn" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="menu-wrap">
+      <button id="moreBtn" class="icon-btn" title="More options" aria-label="More options">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg>
+      </button>
+      <div id="moreMenu" class="menu hidden">
+        <button data-action="export-json">Export as JSON</button>
+        <button data-action="import-json">Import from JSON</button>
+        <button data-action="print">Print list</button>
+        <button data-action="export-pdf">Export to PDF</button>
+        <button data-action="settings">JSONBin settings</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<input type="file" id="importFileInput" accept="application/json" class="hidden" />
+
+<!-- ===================== MAIN ===================== -->
+<main class="app">
+
+  <!-- Dashboard -->
+  <section class="dashboard" id="dashboard" aria-label="Overview">
+    <div class="stat-card" data-filter="all">
+      <span class="stat-num" id="statTotal">0</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-card" data-filter="pending">
+      <span class="stat-num" id="statPending">0</span>
+      <span class="stat-label">Pending</span>
+    </div>
+    <div class="stat-card" data-filter="completed">
+      <span class="stat-num" id="statCompleted">0</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-card stat-card--warn" data-filter="overdue">
+      <span class="stat-num" id="statOverdue">0</span>
+      <span class="stat-label">Overdue</span>
+    </div>
+    <div class="stat-card stat-card--today" data-filter="due-today">
+      <span class="stat-num" id="statDueToday">0</span>
+      <span class="stat-label">Due today</span>
+    </div>
+    <div class="stat-card" data-filter="due-week">
+      <span class="stat-num" id="statDueWeek">0</span>
+      <span class="stat-label">Due this week</span>
+    </div>
+  </section>
+
+  <!-- Toolbar: search + filters + view toggle -->
+  <section class="toolbar">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="search" id="searchInput" placeholder="Search teacher, subject, or title…" aria-label="Search assignments" />
+    </div>
+
+    <div class="filter-chips" id="filterChips" role="tablist" aria-label="Filter assignments">
+      <button class="chip is-active" data-filter="all">All</button>
+      <button class="chip" data-filter="pending">Pending</button>
+      <button class="chip" data-filter="completed">Completed</button>
+      <button class="chip" data-filter="overdue">Overdue</button>
+      <button class="chip" data-filter="due-today">Due today</button>
+      <button class="chip" data-filter="high">High priority</button>
+    </div>
+
+    <div class="view-toggle" role="tablist" aria-label="Switch view">
+      <button class="view-btn is-active" data-view="list">List</button>
+      <button class="view-btn" data-view="calendar">Calendar</button>
+    </div>
+  </section>
+
+  <!-- List view -->
+  <section id="listView" class="list-view">
+    <div id="assignmentList" class="assignment-list"></div>
+    <div id="emptyState" class="empty-state hidden">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 9h8M8 13h8M8 17h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <p id="emptyStateText">Nothing here yet. Add your first assignment to get started.</p>
+    </div>
+  </section>
+
+  <!-- Calendar view -->
+  <section id="calendarView" class="calendar-view hidden">
+    <div class="calendar-header">
+      <button id="calPrev" class="icon-btn" aria-label="Previous month">‹</button>
+      <h2 id="calMonthLabel">Month Year</h2>
+      <button id="calNext" class="icon-btn" aria-label="Next month">›</button>
+    </div>
+    <div class="calendar-grid" id="calendarWeekdays"></div>
+    <div class="calendar-grid" id="calendarDays"></div>
+    <div id="calendarDayPanel" class="calendar-day-panel hidden">
+      <div class="calendar-day-panel__header">
+        <h3 id="calendarDayTitle">Selected day</h3>
+        <button id="calendarDayClose" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div id="calendarDayList"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Floating add button -->
+<button id="fabAdd" class="fab" aria-label="Add assignment">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+</button>
+
+<!-- ===================== ASSIGNMENT FORM MODAL ===================== -->
+<div id="formModal" class="modal-backdrop hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
+    <div class="modal__header">
+      <h2 id="formModalTitle">New assignment</h2>
+      <button class="icon-btn" id="formModalClose" aria-label="Close">✕</button>
+    </div>
+    <form id="assignmentForm" class="modal__body" novalidate>
+      <input type="hidden" id="assignmentId" />
+
+      <div class="form-row">
+        <label for="teacherName">Teacher name <span class="req">*</span></label>
+        <input type="text" id="teacherName" required placeholder="e.g. Ms. Alvarez" />
+      </div>
+
+      <div class="form-row two-col">
+        <div>
+          <label for="subject">Subject <span class="req">*</span></label>
+          <input type="text" id="subject" required placeholder="e.g. Biology" />
+        </div>
+        <div>
+          <label for="priority">Priority</label>
+          <select id="priority">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="title">Assignment title <span class="req">*</span></label>
+        <input type="text" id="title" required placeholder="e.g. Cell structure lab report" />
+      </div>
+
+      <div class="form-row">
+        <label for="description">Description <span class="optional">(optional)</span></label>
+        <textarea id="description" rows="3" placeholder="Any details worth remembering…"></textarea>
+      </div>
+
+      <div class="form-row two-col">
+        <div>
+          <label for="submissionDate">Submission date <span class="req">*</span></label>
+          <input type="date" id="submissionDate" required />
+        </div>
+        <div>
+          <label for="submissionTime">Submission time <span class="optional">(optional)</span></label>
+          <input type="time" id="submissionTime" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="reminder">Reminder</label>
+        <select id="reminder">
+          <option value="none">No reminder</option>
+          <option value="1day">1 day before</option>
+          <option value="sameday">Same day (8:00 AM)</option>
+          <option value="custom">Custom time before</option>
+        </select>
+      </div>
+
+      <div class="form-row hidden" id="customReminderRow">
+        <label for="customReminderMinutes">Remind me before (minutes)</label>
+        <input type="number" id="customReminderMinutes" min="5" step="5" placeholder="e.g. 120" />
+      </div>
+
+      <div class="form-row checkbox-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="completed" />
+          Mark as completed
+        </label>
+      </div>
+
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="formCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn--primary" id="formSubmitBtn">Save assignment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== CONFIRM DELETE MODAL ===================== -->
+<div id="confirmModal" class="modal-backdrop hidden">
+  <div class="modal modal--small" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal__body modal__body--center">
+      <h2 id="confirmTitle">Delete this assignment?</h2>
+      <p id="confirmText">This can't be undone.</p>
+      <div class="modal__footer modal__footer--center">
+        <button class="btn btn--ghost" id="confirmCancelBtn">Cancel</button>
+        <button class="btn btn--danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SETTINGS MODAL ===================== -->
+<div id="settingsModal" class="modal-backdrop hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal__header">
+      <h2 id="settingsTitle">JSONBin settings</h2>
+      <button class="icon-btn" id="settingsModalClose" aria-label="Close">✕</button>
+    </div>
+    <form id="settingsForm" class="modal__body">
+      <div class="form-row">
+        <label for="cfgBinId">Bin ID</label>
+        <input type="text" id="cfgBinId" placeholder="6512abf1..." />
+      </div>
+      <div class="form-row">
+        <label for="cfgMasterKey">X-Master-Key</label>
+        <input type="text" id="cfgMasterKey" placeholder="$2b$10$..." />
+      </div>
+      <div class="form-row">
+        <label for="cfgAccessKey">X-Access-Key <span class="optional">(optional)</span></label>
+        <input type="text" id="cfgAccessKey" placeholder="Only if your bin requires it" />
+      </div>
+      <p class="settings-hint">Get a free bin at <strong>jsonbin.io</strong>. These values are stored locally in your browser only.</p>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="settingsCancelBtn">Cancel</button>
+        <button type="submit" class="btn btn--primary">Save & reload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   CONFIGURATION
+   Edit these three values, or use the "JSONBin settings" menu in the UI
+   (values entered there are saved to localStorage and take priority).
+   Get a free bin + master key at https://jsonbin.io
+   ===================================================================== */
+const DEFAULT_CONFIG = {
+  BIN_ID: 'YOUR_JSONBIN_BIN_ID',
+  MASTER_KEY: 'YOUR_JSONBIN_X_MASTER_KEY',
+  ACCESS_KEY: '', // optional, only needed if your bin enforces it
+};
+const API_BASE = 'https://api.jsonbin.io/v3/b';
+
+/* =====================================================================
+   LOCAL STORAGE KEYS
+   ===================================================================== */
+const LS_CACHE = 'at_assignments_cache';   // last known-good dataset (offline fallback)
+const LS_PENDING = 'at_pending_sync';      // 'true' when local edits haven't reached the cloud yet
+const LS_CONFIG = 'at_jsonbin_config';     // user-entered JSONBin credentials
+const LS_THEME = 'at_theme';
+const LS_NOTIFIED = 'at_notified_log';     // which reminders already fired, so we don't repeat them
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+let assignments = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let currentView = 'list';
+let calendarCursor = new Date();
+let selectedCalendarDay = null; // 'YYYY-MM-DD'
+let pendingDeleteId = null;
+let isFormSubmitting = false;
+let syncTimer = null;
+let reminderTimers = [];
+
+/* =====================================================================
+   CONFIG HELPERS
+   ===================================================================== */
+function getConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_CONFIG) || 'null');
+    if (saved && saved.binId && saved.masterKey) {
+      return { BIN_ID: saved.binId, MASTER_KEY: saved.masterKey, ACCESS_KEY: saved.accessKey || '' };
+    }
+  } catch (e) { /* ignore malformed config */ }
+  return DEFAULT_CONFIG;
+}
+
+function configIsPlaceholder() {
+  const c = getConfig();
+  return c.BIN_ID === 'YOUR_JSONBIN_BIN_ID' || !c.BIN_ID || c.MASTER_KEY === 'YOUR_JSONBIN_X_MASTER_KEY' || !c.MASTER_KEY;
+}
+
+function apiHeaders(extra) {
+  const c = getConfig();
+  const headers = { 'Content-Type': 'application/json', 'X-Master-Key': c.MASTER_KEY };
+  if (c.ACCESS_KEY) headers['X-Access-Key'] = c.ACCESS_KEY;
+  return Object.assign(headers, extra || {});
+}
+
+function binUrl() {
+  return `${API_BASE}/${getConfig().BIN_ID}`;
+}
+
+/* =====================================================================
+   JSONBIN API — GET (load) / PUT (save whole dataset)
+   ===================================================================== */
+async function apiLoad() {
+  const res = await fetch(binUrl() + '/latest', {
+    method: 'GET',
+    headers: apiHeaders({ 'X-Bin-Meta': 'false' }),
+  });
+  if (!res.ok) throw new Error(`JSONBin GET failed (${res.status})`);
+  const data = await res.json();
+  // Bin may be empty on first use, or hold { assignments: [...] } / a raw array.
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.assignments)) return data.assignments;
+  return [];
+}
+
+async function apiSave(list) {
+  const res = await fetch(binUrl(), {
+    method: 'PUT',
+    headers: apiHeaders(),
+    body: JSON.stringify({ assignments: list }),
+  });
+  if (!res.ok) throw new Error(`JSONBin PUT failed (${res.status})`);
+  return res.json();
+}
+
+/* =====================================================================
+   SYNC ORCHESTRATION
+   Every mutation flows through persist(): update in-memory state, cache
+   locally right away, then try the cloud. If the cloud call fails we
+   fall back to "offline" mode and flag pending changes for later sync.
+   ===================================================================== */
+function cacheLocally(list) {
+  localStorage.setItem(LS_CACHE, JSON.stringify(list));
+}
+
+function markPending(isPending) {
+  localStorage.setItem(LS_PENDING, isPending ? 'true' : 'false');
+}
+
+function hasPendingChanges() {
+  return localStorage.getItem(LS_PENDING) === 'true';
+}
+
+async function persist(newList) {
+  assignments = newList;
+  cacheLocally(assignments);
+  render();
+
+  if (configIsPlaceholder()) {
+    setSyncStatus('offline');
+    markPending(true);
+    toast('Add your JSONBin credentials in settings to enable cloud sync.', 'error');
+    return;
+  }
+
+  setSyncStatus('syncing');
+  try {
+    await apiSave(assignments);
+    markPending(false);
+    setSyncStatus('online');
+  } catch (err) {
+    console.warn('Cloud save failed, queued for retry:', err);
+    markPending(true);
+    setSyncStatus('offline');
+    scheduleRetry();
+  }
+}
+
+function scheduleRetry() {
+  if (syncTimer) return; // already scheduled
+  syncTimer = setTimeout(async () => {
+    syncTimer = null;
+    if (!hasPendingChanges()) return;
+    if (!navigator.onLine || configIsPlaceholder()) { scheduleRetry(); return; }
+    await trySyncPending();
+  }, 15000);
+}
+
+async function trySyncPending() {
+  if (!hasPendingChanges() || configIsPlaceholder()) return;
+  setSyncStatus('syncing');
+  try {
+    // Local edits made while offline are the most recent truth — push them up.
+    const local = JSON.parse(localStorage.getItem(LS_CACHE) || '[]');
+    await apiSave(local);
+    markPending(false);
+    // Refresh from the cloud afterward to guarantee consistency.
+    const fresh = await apiLoad();
+    assignments = fresh;
+    cacheLocally(fresh);
+    setSyncStatus('online');
+    render();
+    toast('Synced with the cloud.', 'success');
+  } catch (err) {
+    console.warn('Retry sync failed:', err);
+    setSyncStatus('offline');
+    scheduleRetry();
+  }
+}
+
+function setSyncStatus(status) {
+  const dot = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  dot.className = 'sync-dot ' + status;
+  label.textContent = status === 'online' ? 'Online' : status === 'syncing' ? 'Syncing…' : 'Offline';
+}
+
+/* Browser connectivity events */
+window.addEventListener('online', () => { toast('Back online — syncing…'); trySyncPending(); });
+window.addEventListener('offline', () => setSyncStatus('offline'));
+
+/* =====================================================================
+   INITIAL LOAD
+   ===================================================================== */
+async function loadInitial() {
+  setSyncStatus('syncing');
+
+  if (configIsPlaceholder()) {
+    assignments = JSON.parse(localStorage.getItem(LS_CACHE) || '[]');
+    setSyncStatus('offline');
+    render();
+    toast('Set up JSONBin in settings (⋮ menu) to start syncing to the cloud.');
+    return;
+  }
+
+  try {
+    const cloudData = await apiLoad();
+    assignments = cloudData;
+    cacheLocally(assignments);
+    markPending(false);
+    setSyncStatus('online');
+  } catch (err) {
+    console.warn('Initial cloud load failed, using local cache:', err);
+    assignments = JSON.parse(localStorage.getItem(LS_CACHE) || '[]');
+    setSyncStatus('offline');
+    if (hasPendingChanges()) scheduleRetry();
+  }
+  render();
+}
+
+/* =====================================================================
+   DATE / STATUS HELPERS
+   ===================================================================== */
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function dueDateTime(a) {
+  return new Date(`${a.submissionDate}T${a.submissionTime || '23:59'}`);
+}
+
+function isOverdue(a) {
+  if (a.completed) return false;
+  return dueDateTime(a).getTime() < Date.now();
+}
+
+function isDueToday(a) {
+  return a.submissionDate === todayISO();
+}
+
+function isDueThisWeek(a) {
+  const due = new Date(a.submissionDate + 'T00:00:00');
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+  return due >= start && due < end;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function formatTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+/* =====================================================================
+   FILTER / SEARCH
+   ===================================================================== */
+function matchesFilter(a) {
+  switch (currentFilter) {
+    case 'pending': return !a.completed;
+    case 'completed': return a.completed;
+    case 'overdue': return isOverdue(a);
+    case 'due-today': return isDueToday(a) && !a.completed;
+    case 'due-week': return isDueThisWeek(a);
+    case 'high': return a.priority === 'High';
+    default: return true;
+  }
+}
+
+function matchesSearch(a) {
+  if (!currentSearch) return true;
+  const q = currentSearch.toLowerCase();
+  return (a.teacherName || '').toLowerCase().includes(q) ||
+         (a.subject || '').toLowerCase().includes(q) ||
+         (a.title || '').toLowerCase().includes(q);
+}
+
+function getFilteredSorted() {
+  return assignments
+    .filter(matchesFilter)
+    .filter(matchesSearch)
+    .sort((a, b) => dueDateTime(a) - dueDateTime(b));
+}
+
+/* =====================================================================
+   RENDER — DASHBOARD
+   ===================================================================== */
+function renderDashboard() {
+  const total = assignments.length;
+  const pending = assignments.filter(a => !a.completed).length;
+  const completed = assignments.filter(a => a.completed).length;
+  const overdue = assignments.filter(isOverdue).length;
+  const dueToday = assignments.filter(a => isDueToday(a) && !a.completed).length;
+  const dueWeek = assignments.filter(isDueThisWeek).length;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statCompleted').textContent = completed;
+  document.getElementById('statOverdue').textContent = overdue;
+  document.getElementById('statDueToday').textContent = dueToday;
+  document.getElementById('statDueWeek').textContent = dueWeek;
+}
+
+/* =====================================================================
+   RENDER — LIST
+   ===================================================================== */
+function priorityBadgeClass(p) {
+  return p === 'High' ? 'badge--high' : p === 'Medium' ? 'badge--medium' : 'badge--low';
+}
+
+function cardHtml(a) {
+  const overdue = isOverdue(a);
+  const dueToday = isDueToday(a) && !a.completed;
+  let statusBadge = '';
+  if (overdue) statusBadge = '<span class="badge badge--overdue">Overdue</span>';
+  else if (dueToday) statusBadge = '<span class="badge badge--today">Due today</span>';
+
+  return `
+  <article class="a-card ${a.completed ? 'is-completed' : ''} ${overdue ? 'is-overdue' : ''}" data-id="${a.id}" data-priority="${a.priority}">
+    <button class="a-card__check" data-action="toggle" aria-label="Mark complete">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="a-card__body">
+      <div class="a-card__top">
+        <h3 class="a-card__title">${escapeHtml(a.title)}</h3>
+      </div>
+      <div class="a-card__meta">
+        <span>${escapeHtml(a.teacherName)}</span>
+        <span>·</span>
+        <span>${escapeHtml(a.subject)}</span>
+        <span class="badge ${priorityBadgeClass(a.priority)}">${a.priority}</span>
+        ${statusBadge}
+      </div>
+      ${a.description ? `<p class="a-card__desc">${escapeHtml(a.description)}</p>` : ''}
+    </div>
+    <div class="a-card__due">
+      <strong>${formatDate(a.submissionDate)}</strong>
+      ${a.submissionTime ? formatTime(a.submissionTime) : ''}
+    </div>
+    <div class="a-card__actions">
+      <button data-action="edit" aria-label="Edit">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 00-3-3L5 17v3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      </button>
+      <button data-action="delete" aria-label="Delete">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0l1 12a1 1 0 001 1h6a1 1 0 001-1l1-12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </article>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+function renderList() {
+  const list = getFilteredSorted();
+  const container = document.getElementById('assignmentList');
+  const empty = document.getElementById('emptyState');
+  const emptyText = document.getElementById('emptyStateText');
+
+  if (list.length === 0) {
+    container.innerHTML = '';
+    empty.classList.remove('hidden');
+    emptyText.textContent = assignments.length === 0
+      ? 'Nothing here yet. Add your first assignment to get started.'
+      : 'No assignments match this view.';
+  } else {
+    empty.classList.add('hidden');
+    container.innerHTML = list.map(cardHtml).join('');
+  }
+}
+
+/* =====================================================================
+   RENDER — CALENDAR
+   ===================================================================== */
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function renderCalendar() {
+  const year = calendarCursor.getFullYear();
+  const month = calendarCursor.getMonth();
+  document.getElementById('calMonthLabel').textContent =
+    calendarCursor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+  const weekdaysEl = document.getElementById('calendarWeekdays');
+  weekdaysEl.innerHTML = WEEKDAYS.map(w => `<div class="cal-weekday">${w}</div>`).join('');
+
+  const firstDay = new Date(year, month, 1);
+  const startOffset = firstDay.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = todayISO();
+
+  // Group assignments by date for quick lookup
+  const byDate = {};
+  assignments.forEach(a => {
+    (byDate[a.submissionDate] = byDate[a.submissionDate] || []).push(a);
+  });
+
+  let html = '';
+  for (let i = 0; i < startOffset; i++) html += `<div class="cal-day is-muted"></div>`;
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const items = byDate[iso] || [];
+    const isToday = iso === today;
+    const isSelected = iso === selectedCalendarDay;
+    let dots = '';
+    if (items.length) {
+      const priorities = [...new Set(items.map(i => i.priority))].slice(0, 3);
+      dots = `<div class="cal-day-dots">${priorities.map(p =>
+        `<span style="background:${p === 'High' ? 'var(--high)' : p === 'Medium' ? 'var(--medium)' : 'var(--low)'}"></span>`).join('')}</div>`;
+    }
+    html += `<button class="cal-day ${items.length ? 'has-items' : ''} ${isToday ? 'is-today' : ''} ${isSelected ? 'is-selected' : ''}" data-date="${iso}">
+      <span>${day}</span>${dots}
+    </button>`;
+  }
+  document.getElementById('calendarDays').innerHTML = html;
+
+  if (selectedCalendarDay) renderCalendarDayPanel();
+}
+
+function renderCalendarDayPanel() {
+  const panel = document.getElementById('calendarDayPanel');
+  const items = assignments.filter(a => a.submissionDate === selectedCalendarDay);
+  if (!selectedCalendarDay) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  const d = new Date(selectedCalendarDay + 'T00:00:00');
+  document.getElementById('calendarDayTitle').textContent = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  const listEl = document.getElementById('calendarDayList');
+  listEl.innerHTML = items.length
+    ? items.map(cardHtml).join('')
+    : '<p style="color:var(--text-muted);font-size:13px;">Nothing due this day.</p>';
+}
+
+/* =====================================================================
+   MASTER RENDER
+   ===================================================================== */
+function render() {
+  renderDashboard();
+  if (currentView === 'list') renderList();
+  else renderCalendar();
+  scheduleReminders();
+}
+
+/* =====================================================================
+   CRUD
+   ===================================================================== */
+function genId() {
+  return (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
+}
+
+function upsertAssignment(data, editingId) {
+  const now = new Date().toISOString();
+  if (editingId) {
+    const updated = assignments.map(a => a.id === editingId ? { ...a, ...data, updatedAt: now } : a);
+    persist(updated);
+    toast('Assignment updated.', 'success');
+  } else {
+    const newItem = { id: genId(), createdAt: now, updatedAt: now, ...data };
+    persist([...assignments, newItem]);
+    toast('Assignment added.', 'success');
+  }
+}
+
+function deleteAssignment(id) {
+  persist(assignments.filter(a => a.id !== id));
+  toast('Assignment deleted.', 'success');
+}
+
+function toggleComplete(id) {
+  const now = new Date().toISOString();
+  const updated = assignments.map(a => a.id === id ? { ...a, completed: !a.completed, updatedAt: now } : a);
+  persist(updated);
+}
+
+/* =====================================================================
+   FORM MODAL
+   ===================================================================== */
+const formModal = document.getElementById('formModal');
+const assignmentForm = document.getElementById('assignmentForm');
+
+function openForm(editingAssignment) {
+  assignmentForm.reset();
+  document.getElementById('customReminderRow').classList.add('hidden');
+  if (editingAssignment) {
+    document.getElementById('formModalTitle').textContent = 'Edit assignment';
+    document.getElementById('assignmentId').value = editingAssignment.id;
+    document.getElementById('teacherName').value = editingAssignment.teacherName;
+    document.getElementById('subject').value = editingAssignment.subject;
+    document.getElementById('priority').value = editingAssignment.priority;
+    document.getElementById('title').value = editingAssignment.title;
+    document.getElementById('description').value = editingAssignment.description || '';
+    document.getElementById('submissionDate').value = editingAssignment.submissionDate;
+    document.getElementById('submissionTime').value = editingAssignment.submissionTime || '';
+    document.getElementById('reminder').value = editingAssignment.reminder || 'none';
+    document.getElementById('customReminderMinutes').value = editingAssignment.customReminderMinutes || '';
+    document.getElementById('completed').checked = !!editingAssignment.completed;
+    if (editingAssignment.reminder === 'custom') document.getElementById('customReminderRow').classList.remove('hidden');
+  } else {
+    document.getElementById('formModalTitle').textContent = 'New assignment';
+    document.getElementById('assignmentId').value = '';
+    document.getElementById('submissionDate').value = todayISO();
+  }
+  formModal.classList.remove('hidden');
+  document.getElementById('teacherName').focus();
+}
+
+function closeForm() { formModal.classList.add('hidden'); }
+
+document.getElementById('fabAdd').addEventListener('click', () => openForm(null));
+document.getElementById('formModalClose').addEventListener('click', closeForm);
+document.getElementById('formCancelBtn').addEventListener('click', closeForm);
+formModal.addEventListener('click', e => { if (e.target === formModal) closeForm(); });
+
+document.getElementById('reminder').addEventListener('change', e => {
+  document.getElementById('customReminderRow').classList.toggle('hidden', e.target.value !== 'custom');
+});
+
+assignmentForm.addEventListener('submit', e => {
+  e.preventDefault();
+  if (isFormSubmitting) return; // guard against duplicate submissions (double-click / double-tap)
+  isFormSubmitting = true;
+  document.getElementById('formSubmitBtn').disabled = true;
+
+  try {
+    const editingId = document.getElementById('assignmentId').value || null;
+    const data = {
+      teacherName: document.getElementById('teacherName').value.trim(),
+      subject: document.getElementById('subject').value.trim(),
+      title: document.getElementById('title').value.trim(),
+      description: document.getElementById('description').value.trim(),
+      submissionDate: document.getElementById('submissionDate').value,
+      submissionTime: document.getElementById('submissionTime').value,
+      priority: document.getElementById('priority').value,
+      reminder: document.getElementById('reminder').value,
+      customReminderMinutes: document.getElementById('customReminderMinutes').value || null,
+      completed: document.getElementById('completed').checked,
+    };
+    if (!data.teacherName || !data.subject || !data.title || !data.submissionDate) {
+      toast('Please fill in all required fields.', 'error');
+      return;
+    }
+    upsertAssignment(data, editingId);
+    closeForm();
+  } finally {
+    isFormSubmitting = false;
+    document.getElementById('formSubmitBtn').disabled = false;
+  }
+});
+
+/* =====================================================================
+   DELETE CONFIRMATION
+   ===================================================================== */
+const confirmModal = document.getElementById('confirmModal');
+document.getElementById('confirmCancelBtn').addEventListener('click', () => { pendingDeleteId = null; confirmModal.classList.add('hidden'); });
+document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+  if (pendingDeleteId) deleteAssignment(pendingDeleteId);
+  pendingDeleteId = null;
+  confirmModal.classList.add('hidden');
+});
+confirmModal.addEventListener('click', e => { if (e.target === confirmModal) { pendingDeleteId = null; confirmModal.classList.add('hidden'); } });
+
+/* =====================================================================
+   CARD ACTIONS (event delegation — list, calendar day panel)
+   ===================================================================== */
+function handleCardClick(e) {
+  const card = e.target.closest('.a-card');
+  if (!card) return;
+  const id = card.dataset.id;
+  const action = e.target.closest('button')?.dataset.action;
+  if (action === 'toggle') toggleComplete(id);
+  else if (action === 'edit') openForm(assignments.find(a => a.id === id));
+  else if (action === 'delete') {
+    pendingDeleteId = id;
+    document.getElementById('confirmText').textContent = `"${card.querySelector('.a-card__title').textContent}" will be permanently removed.`;
+    confirmModal.classList.remove('hidden');
+  }
+}
+document.getElementById('assignmentList').addEventListener('click', handleCardClick);
+document.getElementById('calendarDayList').addEventListener('click', handleCardClick);
+
+/* =====================================================================
+   TOOLBAR: search, filters, view toggle
+   ===================================================================== */
+let searchDebounce = null;
+document.getElementById('searchInput').addEventListener('input', e => {
+  clearTimeout(searchDebounce);
+  const value = e.target.value;
+  searchDebounce = setTimeout(() => { currentSearch = value; render(); }, 200);
+});
+
+document.getElementById('filterChips').addEventListener('click', e => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  currentFilter = btn.dataset.filter;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-active', c === btn));
+  render();
+});
+
+document.getElementById('dashboard').addEventListener('click', e => {
+  const card = e.target.closest('.stat-card');
+  if (!card) return;
+  currentFilter = card.dataset.filter;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-active', c.dataset.filter === currentFilter));
+  render();
+});
+
+document.querySelectorAll('.view-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentView = btn.dataset.view;
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('is-active', b === btn));
+    document.getElementById('listView').classList.toggle('hidden', currentView !== 'list');
+    document.getElementById('calendarView').classList.toggle('hidden', currentView !== 'calendar');
+    render();
+  });
+});
+
+/* =====================================================================
+   CALENDAR NAVIGATION
+   ===================================================================== */
+document.getElementById('calPrev').addEventListener('click', () => {
+  calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1);
+  renderCalendar();
+});
+document.getElementById('calNext').addEventListener('click', () => {
+  calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 1);
+  renderCalendar();
+});
+document.getElementById('calendarDays').addEventListener('click', e => {
+  const btn = e.target.closest('.cal-day[data-date]');
+  if (!btn) return;
+  selectedCalendarDay = btn.dataset.date === selectedCalendarDay ? null : btn.dataset.date;
+  renderCalendar();
+});
+document.getElementById('calendarDayClose').addEventListener('click', () => {
+  selectedCalendarDay = null;
+  renderCalendar();
+});
+
+/* =====================================================================
+   DARK MODE
+   ===================================================================== */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(LS_THEME, theme);
+}
+document.getElementById('darkModeBtn').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(current);
+});
+(function initTheme() {
+  const saved = localStorage.getItem(LS_THEME);
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+})();
+
+/* =====================================================================
+   MORE MENU (export / import / print / pdf / settings)
+   ===================================================================== */
+const moreMenu = document.getElementById('moreMenu');
+document.getElementById('moreBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  moreMenu.classList.toggle('hidden');
+});
+document.addEventListener('click', () => moreMenu.classList.add('hidden'));
+
+moreMenu.addEventListener('click', e => {
+  const action = e.target.closest('button')?.dataset.action;
+  if (!action) return;
+  if (action === 'export-json') exportJson();
+  else if (action === 'import-json') document.getElementById('importFileInput').click();
+  else if (action === 'print') window.print();
+  else if (action === 'export-pdf') exportPdf();
+  else if (action === 'settings') openSettings();
+});
+
+function exportJson() {
+  const blob = new Blob([JSON.stringify(assignments, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `assignments-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Exported assignments.json', 'success');
+}
+
+document.getElementById('importFileInput').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    const list = Array.isArray(parsed) ? parsed : (parsed.assignments || []);
+    if (!Array.isArray(list)) throw new Error('Invalid file format');
+    // Assign fresh ids to avoid collisions with existing data, keep provided fields.
+    const now = new Date().toISOString();
+    const imported = list.map(item => ({
+      id: genId(),
+      teacherName: item.teacherName || '',
+      subject: item.subject || '',
+      title: item.title || 'Untitled assignment',
+      description: item.description || '',
+      submissionDate: item.submissionDate || todayISO(),
+      submissionTime: item.submissionTime || '',
+      priority: item.priority || 'Medium',
+      completed: !!item.completed,
+      reminder: item.reminder || 'none',
+      customReminderMinutes: item.customReminderMinutes || null,
+      createdAt: item.createdAt || now,
+      updatedAt: now,
+    }));
+    persist([...assignments, ...imported]);
+    toast(`Imported ${imported.length} assignment(s).`, 'success');
+  } catch (err) {
+    toast('Could not import that file. Make sure it is valid JSON.', 'error');
+  } finally {
+    e.target.value = '';
+  }
+});
+
+function exportPdf() {
+  // No PDF library is used to keep the app dependency-free and fast-loading;
+  // the browser's native print dialog can save directly to PDF.
+  toast('Choose "Save as PDF" in the print dialog.');
+  setTimeout(() => window.print(), 400);
+}
+
+/* =====================================================================
+   SETTINGS MODAL
+   ===================================================================== */
+const settingsModal = document.getElementById('settingsModal');
+function openSettings() {
+  const c = JSON.parse(localStorage.getItem(LS_CONFIG) || '{}');
+  document.getElementById('cfgBinId').value = c.binId || (DEFAULT_CONFIG.BIN_ID !== 'YOUR_JSONBIN_BIN_ID' ? DEFAULT_CONFIG.BIN_ID : '');
+  document.getElementById('cfgMasterKey').value = c.masterKey || (DEFAULT_CONFIG.MASTER_KEY !== 'YOUR_JSONBIN_X_MASTER_KEY' ? DEFAULT_CONFIG.MASTER_KEY : '');
+  document.getElementById('cfgAccessKey').value = c.accessKey || DEFAULT_CONFIG.ACCESS_KEY || '';
+  settingsModal.classList.remove('hidden');
+}
+document.getElementById('settingsModalClose').addEventListener('click', () => settingsModal.classList.add('hidden'));
+document.getElementById('settingsCancelBtn').addEventListener('click', () => settingsModal.classList.add('hidden'));
+settingsModal.addEventListener('click', e => { if (e.target === settingsModal) settingsModal.classList.add('hidden'); });
+
+document.getElementById('settingsForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const binId = document.getElementById('cfgBinId').value.trim();
+  const masterKey = document.getElementById('cfgMasterKey').value.trim();
+  const accessKey = document.getElementById('cfgAccessKey').value.trim();
+  if (!binId || !masterKey) { toast('Bin ID and X-Master-Key are required.', 'error'); return; }
+  localStorage.setItem(LS_CONFIG, JSON.stringify({ binId, masterKey, accessKey }));
+  toast('Settings saved. Reloading…', 'success');
+  setTimeout(() => location.reload(), 600);
+});
+
+/* =====================================================================
+   NOTIFICATIONS
+   ===================================================================== */
+document.getElementById('notifBtn').addEventListener('click', async () => {
+  if (!('Notification' in window)) { toast('This browser does not support notifications.', 'error'); return; }
+  const perm = await Notification.requestPermission();
+  toast(perm === 'granted' ? 'Reminders enabled.' : 'Reminders were not enabled.', perm === 'granted' ? 'success' : 'error');
+  if (perm === 'granted') scheduleReminders();
+});
+
+function getNotifiedLog() {
+  try { return JSON.parse(localStorage.getItem(LS_NOTIFIED) || '{}'); } catch (e) { return {}; }
+}
+function markNotified(key) {
+  const log = getNotifiedLog();
+  log[key] = true;
+  localStorage.setItem(LS_NOTIFIED, JSON.stringify(log));
+}
+
+function reminderFireTime(a) {
+  const due = dueDateTime(a);
+  if (a.reminder === '1day') return new Date(due.getTime() - 24 * 60 * 60 * 1000);
+  if (a.reminder === 'sameday') {
+    const d = new Date(a.submissionDate + 'T08:00:00');
+    return d;
+  }
+  if (a.reminder === 'custom' && a.customReminderMinutes) {
+    return new Date(due.getTime() - Number(a.customReminderMinutes) * 60000);
+  }
+  return null;
+}
+
+// Reminders are scheduled with setTimeout while the app is open (the
+// Notification API has no reliable background trigger without a push
+// server). Only timers within the next 7 days are armed to stay light.
+function scheduleReminders() {
+  reminderTimers.forEach(clearTimeout);
+  reminderTimers = [];
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  const log = getNotifiedLog();
+  const now = Date.now();
+  const horizon = now + 7 * 24 * 60 * 60 * 1000;
+
+  assignments.forEach(a => {
+    if (a.completed || !a.reminder || a.reminder === 'none') return;
+    const fireAt = reminderFireTime(a);
+    if (!fireAt) return;
+    const key = `${a.id}:${a.reminder}:${a.updatedAt}`;
+    if (log[key]) return;
+    const delay = fireAt.getTime() - now;
+    if (delay < 0 || fireAt.getTime() > horizon) return;
+
+    const timer = setTimeout(() => {
+      new Notification('Assignment due soon', {
+        body: `${a.title} — ${a.subject} (${formatDate(a.submissionDate)}${a.submissionTime ? ' at ' + formatTime(a.submissionTime) : ''})`,
+      });
+      markNotified(key);
+    }, delay);
+    reminderTimers.push(timer);
+  });
+}
+
+/* =====================================================================
+   TOASTS
+   ===================================================================== */
+function toast(message, type) {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ` toast--${type}` : '');
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 3600);
+}
+
+/* =====================================================================
+   SERVICE WORKER (PWA / offline shell)
+   ===================================================================== */
+// Service worker registration omitted in this single-file build.
+// Offline support still works via localStorage caching + the sync-status indicator.
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+loadInitial();
+if (hasPendingChanges()) scheduleRetry();
+
+</script>
+</body>
+</html>
