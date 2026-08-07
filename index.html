@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nutrition Resource Library</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#eef3f8;
+    color:#222;
+}
+
+/* Header */
+
+header{
+    background:#0d47a1;
+    color:white;
+    padding:18px;
+}
+
+.header-container{
+    max-width:1000px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.logo{
+    width:80px;
+    height:80px;
+    object-fit:contain;
+    background:white;
+    border-radius:10px;
+    padding:6px;
+}
+
+.title{
+    flex:1;
+    text-align:center;
+}
+
+.title h1{
+    font-size:30px;
+    margin-bottom:8px;
+}
+
+.title p{
+    opacity:.9;
+}
+
+/* Main */
+
+main{
+    max-width:900px;
+    margin:35px auto;
+    padding:15px;
+}
+
+.section-title{
+    text-align:center;
+    margin-bottom:25px;
+    font-size:26px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border-radius:14px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h2{
+    margin-bottom:12px;
+}
+
+.card p{
+    color:#666;
+    margin-bottom:18px;
+}
+
+.btn{
+    display:inline-block;
+    text-decoration:none;
+    background:#1565c0;
+    color:white;
+    padding:12px 22px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.btn:hover{
+    background:#0d47a1;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    color:#777;
+    font-size:14px;
+}
+
+/* Mobile */
+
+@media(max-width:700px){
+
+.header-container{
+    flex-direction:column;
+}
+
+.logo{
+    width:60px;
+    height:60px;
+}
+
+.title h1{
+    font-size:22px;
+}
+
+.title p{
+    font-size:14px;
+}
+
+}
+</style>
+
+</head>
+<body>
+
+<header>
+
+<div class="header-container">
+
+<img src="vulogo.png" class="logo" alt="VU Logo">
+
+<div class="title">
+<h1>Nutrition Resource Library</h1>
+<p>Varendra University • Department of Nutrition & Food Engineering</p>
+</div>
+
+<img src="nfelogo.png" class="logo" alt="NFE Logo">
+
+</div>
+
+</header>
+
+<main>
+
+<h2 class="section-title">Study Resources</h2>
+
+<div class="grid">
+
+<div class="card">
+<h2>📄 Assignment</h2>
+<p>Assignments and coursework.</p>
+
+<a class="btn" href="assignment.html">
+Open
+</a>
+
+</div>
+
+<div class="card">
+<h2>🧪 Lab</h2>
+<p>Laboratory reports and practical files.</p>
+
+<a class="btn" href="lab.html">
+Open
+</a>
+
+</div>
+
+</div>
+
+</main>
+
+<footer>
+© 2026 Nutrition & Food Engineering | Varendra University
+</footer>
+
+</body>
+</html>
