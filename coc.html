@@ -1,1 +1,519 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>আচরণবিধি | বরেন্দ্র বিশ্ববিদ্যালয়</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon:#e07a5f;
+    --maroon-deep:#c65f45;
+    --paper:#fffaf3;
+    --paper-2:#fef1e2;
+    --ink:#3a322c;
+    --ink-soft:#7a6f63;
+    --gold:#3d8f8a;
+    --line:#f0dfc9;
+    --green:#3c5c3f;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(107,22,32,0.05), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(107,22,32,0.05), transparent 40%);
+    color:var(--ink);
+    font-family:'Hind Siliguri', sans-serif;
+    line-height:1.7;
+  }
+  .bangla-serif{font-family:'Tiro Bangla', serif;}
+
+  /* ===== Header ===== */
+  header{
+    background:linear-gradient(135deg, #f4a988 0%, #e07a5f 55%, #3d8f8a 130%);
+    color:#3a1f16;
+    padding:2.8rem 1.5rem 3.2rem;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    border-bottom-left-radius:32px;
+    border-bottom-right-radius:32px;
+  }
+  header::after{
+    content:"🎓";
+    position:absolute;
+    font-size:5rem;
+    opacity:0.12;
+    right:-1rem; bottom:-1.5rem;
+    transform:rotate(-12deg);
+    pointer-events:none;
+  }
+  .emoji-badge{
+    font-size:2.4rem;
+    margin-bottom:0.4rem;
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,0.12));
+  }
+  header h1{
+    font-family:'Tiro Bangla', serif;
+    font-size:1.85rem;
+    margin:0.2rem 0 0.1rem;
+    letter-spacing:0.01em;
+    color:#3a1f16;
+  }
+  header .subtitle{
+    font-size:0.85rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:#5c2f1e;
+    font-weight:600;
+    margin-bottom:0.6rem;
+    opacity:0.85;
+  }
+  header .meta{
+    font-size:0.85rem;
+    color:#4a281a;
+    max-width:640px;
+    margin:0.7rem auto 0;
+    opacity:0.85;
+    background:rgba(255,255,255,0.35);
+    padding:0.5rem 0.9rem;
+    border-radius:14px;
+    display:inline-block;
+  }
+
+  /* ===== Intro ===== */
+  .intro{
+    max-width:840px;
+    margin:1.6rem auto 0;
+    padding:0 1.4rem;
+    font-size:0.95rem;
+    color:var(--ink-soft);
+    text-align:justify;
+  }
+  .intro p{margin:0;}
+
+  /* ===== Search & filter bar ===== */
+  .toolbar{
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:1.1rem 1.4rem 0.9rem;
+    max-width:100%;
+  }
+  .toolbar-inner{max-width:840px;margin:0 auto;}
+  .search-box{
+    position:relative;
+    margin-bottom:0.7rem;
+  }
+  .search-box input{
+    width:100%;
+    padding:0.7rem 2.6rem 0.7rem 1rem;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    background:#fffdf8;
+    font-family:'Hind Siliguri', sans-serif;
+    font-size:0.98rem;
+    color:var(--ink);
+    outline:none;
+    transition:border-color 0.15s;
+  }
+  .search-box input:focus{border-color:var(--maroon);}
+  .search-box svg{
+    position:absolute; right:0.85rem; top:50%; transform:translateY(-50%);
+    width:18px;height:18px; color:var(--ink-soft); pointer-events:none;
+  }
+  .chip-row{
+    display:flex; flex-wrap:wrap; gap:0.4rem;
+  }
+  .chip{
+    font-size:0.78rem;
+    padding:0.35rem 0.75rem;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fffdf8;
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all 0.15s;
+    user-select:none;
+  }
+  .chip:hover{border-color:var(--maroon);}
+  .chip.active{
+    background:var(--maroon);
+    border-color:var(--maroon);
+    color:#f3ead9;
+  }
+  .result-count{
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin-top:0.55rem;
+  }
+
+  /* ===== Categories & rules ===== */
+  main{max-width:840px; margin:0 auto; padding:1.6rem 1.4rem 3rem;}
+  .category{
+    margin-bottom:1.6rem;
+  }
+  .category-head{
+    display:flex; align-items:center; gap:0.6rem;
+    margin-bottom:0.6rem;
+    padding-bottom:0.4rem;
+    border-bottom:2px solid var(--maroon);
+  }
+  .category-dot{
+    font-size:1.2rem;
+    flex-shrink:0;
+    line-height:1;
+  }
+  .category-head h2{
+    font-family:'Tiro Bangla', serif;
+    font-size:1.15rem;
+    margin:0;
+    color:var(--maroon-deep);
+  }
+  .category-head .en{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    margin-left:auto;
+  }
+  .rule{
+    display:flex;
+    gap:0.85rem;
+    background:#fffdf8;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:0.95rem 1.1rem;
+    margin-bottom:0.6rem;
+    transition:box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .rule:hover{box-shadow:0 6px 18px rgba(224,122,95,0.14); border-color:#f0b79e; transform:translateY(-1px);}
+  .rule.hidden{display:none;}
+  .rule-num{
+    flex-shrink:0;
+    width:34px;height:34px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--maroon), var(--gold));
+    color:#fff;
+    font-family:'Tiro Bangla', serif;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.95rem;
+  }
+  .rule-text{font-size:0.93rem; text-align:justify; color:var(--ink);}
+  mark{background:#f4d78c; color:inherit; border-radius:2px; padding:0 1px;}
+
+  .no-results{
+    text-align:center;
+    color:var(--ink-soft);
+    padding:2.5rem 1rem;
+    font-size:0.95rem;
+    display:none;
+  }
+
+  /* ===== Punishment section ===== */
+  .punish{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:1.3rem 1.4rem;
+    margin:2rem 0 1.5rem;
+  }
+  .punish h2{
+    font-family:'Tiro Bangla', serif;
+    color:var(--maroon-deep);
+    font-size:1.15rem;
+    margin-top:0;
+  }
+  .punish ol{
+    margin:0; padding-left:1.3rem;
+    font-size:0.92rem;
+    color:var(--ink);
+  }
+  .punish li{margin-bottom:0.4rem;}
+  .punish .note{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    margin-bottom:0.9rem;
+    text-align:justify;
+  }
+
+  .declaration{
+    border-left:3px solid var(--gold);
+    padding:0.2rem 0 0.2rem 1rem;
+    font-size:0.9rem;
+    color:var(--ink-soft);
+    text-align:justify;
+    margin-bottom:1.5rem;
+  }
+  .declaration h3{
+    font-family:'Tiro Bangla', serif;
+    color:var(--maroon-deep);
+    font-size:1rem;
+    margin:0 0 0.4rem;
+  }
+
+  /* ===== Commitment form (digitized) ===== */
+  .form-card{
+    background:#fffdf8;
+    border:1.5px dashed var(--gold);
+    border-radius:20px;
+    padding:1.3rem 1.4rem;
+    margin-bottom:1.5rem;
+  }
+  .form-card h2{
+    font-family:'Tiro Bangla', serif;
+    color:var(--maroon-deep);
+    font-size:1.15rem;
+    text-align:center;
+    margin-top:0;
+  }
+  .form-card p.body-text{font-size:0.9rem; color:var(--ink); text-align:justify;}
+  .field-grid{
+    display:grid; grid-template-columns:1fr; gap:0.55rem;
+    margin-top:1rem; font-size:0.88rem; color:var(--ink-soft);
+  }
+  .field-grid .field{border-bottom:1px solid var(--line); padding-bottom:0.4rem;}
+  .field-grid .field b{color:var(--ink); font-weight:600;}
+
+  footer{
+    text-align:center;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    padding:1.5rem;
+    border-top:1px solid var(--line);
+  }
+
+  @media (max-width:520px){
+    header h1{font-size:1.5rem;}
+    .category-head .en{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="emoji-badge">📘</div>
+  <div class="subtitle">Code of Conduct</div>
+  <h1>শিক্ষার্থীদের আচরণবিধি</h1>
+  <div class="meta">বেসরকারি বিশ্ববিদ্যালয় আইন, ২০১০ (ধারা ১৮) অনুযায়ী সিন্ডিকেট কর্তৃক প্রণীত ও ২৯ জুন ২০২৬ তারিখে অনুষ্ঠিত সিন্ডিকেটের ১৩তম সভায় অনুমোদিত — মোট ৩০টি ধারা</div>
+</header>
+
+<div class="intro">
+  <p>মানসম্মত উচ্চশিক্ষার প্রসার ও বিস্তারের লক্ষ্যে বরেন্দ্র বিশ্ববিদ্যালয় একটি সুস্থ ও শিক্ষাবান্ধব পরিবেশ গড়ে তুলতে প্রতিশ্রুতিবদ্ধ। এ লক্ষ্যে শিক্ষার্থীদের মধ্যে শৃঙ্খলা, দায়িত্ব, শ্রদ্ধাবোধ, পারস্পরিক বোঝাপড়া, নিরাপত্তা ও সর্বোপরি সমাজে একজন সুনাগরিক হিসেবে গড়ে উঠার জন্য একটি নির্দিষ্ট আচরণবিধি অপরিহার্য। বেসরকারি বিশ্ববিদ্যালয় আইন, ২০১০ (ধারা ১৮)-এর ক্ষমতাবলে বরেন্দ্র বিশ্ববিদ্যালয়ের সিন্ডিকেট কর্তৃক বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য বিশ্ববিদ্যালয়ের একাডেমিক অর্ডিন্যান্স এবং ২০১৬ সালের যৌন হয়রানি ও নিপীড়ন প্রতিরোধ নীতিমালার আলোকে শিক্ষার্থীদের নিম্নোক্ত আচরণবিধি প্রণীত হলো এবং তা মেনে চলা বাধ্যতামূলক।</p>
+</div>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="ধারা খুঁজুন… (যেমন: মাদক, পরীক্ষা, পোশাক, AI)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <div class="chip-row" id="chipRow"></div>
+    <div class="result-count" id="resultCount"></div>
+  </div>
+</div>
+
+<main id="rulesContainer"></main>
+
+<div class="no-results" id="noResults" style="max-width:840px;margin:0 auto;">কোনো ধারা খুঁজে পাওয়া যায়নি। ভিন্ন শব্দ দিয়ে চেষ্টা করুন।</div>
+
+<div style="max-width:840px;margin:0 auto;padding:0 1.4rem;">
+
+  <div class="punish">
+    <h2>শাস্তিমূলক ব্যবস্থা</h2>
+    <p class="note">আচরণবিধি লঙ্ঘন প্রমাণিত হলে, অভিযোগের প্রকৃতি ও গুরুত্ব বিবেচনায় সংশ্লিষ্ট কমিটি অভিযুক্ত শিক্ষার্থী/শিক্ষার্থীদের বিরুদ্ধে নিম্নলিখিত যেকোনো ব্যবস্থা গ্রহণ করতে পারে —</p>
+    <ol>
+      <li>মৌখিক সতর্কতা।</li>
+      <li>লিখিত সতর্কতা।</li>
+      <li>লিখিত সতর্কতা, যা বিশ্ববিদ্যালয়ের প্রয়োজনে নোটিশ আকারে প্রচার করা হতে পারে।</li>
+      <li>এক বা একাধিক সেমিস্টারের জন্য সাময়িক বহিষ্কার, প্রয়োজনে নোটিশ প্রচারসহ।</li>
+      <li>স্থায়ী বহিষ্কার, প্রয়োজনে নোটিশ প্রচারসহ।</li>
+      <li>সনদ বাতিল বা সাময়িক স্থগিত।</li>
+      <li>রাষ্ট্রের প্রচলিত আইন অনুযায়ী প্রয়োজনীয় ব্যবস্থা গ্রহণের লক্ষ্যে আইনশৃঙ্খলা রক্ষাকারী বাহিনীর নিকট হস্তান্তর।</li>
+    </ol>
+  </div>
+
+  <div class="declaration">
+    <h3>ঘোষণা (Declaration)</h3>
+    <p>এই আচরণবিধি বিশ্ববিদ্যালয় ক্যাম্পাস, বিশ্ববিদ্যালয়ের পরিবহন, অনলাইন প্ল্যাটফর্ম এবং বিশ্ববিদ্যালয় কর্তৃক আয়োজিত বা বিশ্ববিদ্যালয়-সংশ্লিষ্ট যেকোনো অফ-ক্যাম্পাস কার্যক্রমে সমানভাবে প্রযোজ্য হবে। উল্লিখিত আচরণবিধি কার্যকর করার লক্ষ্যে বরেন্দ্র বিশ্ববিদ্যালয়ে নিজস্ব শৃঙ্খলা কমিটি এবং যৌন হয়রানি ও নিপীড়ন সংক্রান্ত অভিযোগ কমিটি বিদ্যমান রয়েছে। কোনো শিক্ষার্থী দেশের প্রচলিত ফৌজদারি আইনে গুরুতর অপরাধে অভিযুক্ত বা দণ্ডপ্রাপ্ত হয় তাহলে বিশ্ববিদ্যালয় তা আমলে নিয়ে বিধি মোতাবেক যেকোনো ব্যবস্থা গ্রহণের এখতিয়ার রাখে। ভবিষ্যতে বিশ্ববিদ্যালয় কর্তৃপক্ষ অনুমোদিত ও প্রচারিত যেকোনো নিয়ম-নীতি এই আচরণবিধিতে অন্তর্ভুক্ত হবে এবং তা অমান্য করা শৃঙ্খলা বিরোধী অসদাচরণ বলে বিবেচিত হবে।</p>
+  </div>
+
+  <div class="form-card">
+    <h2>শিক্ষার্থীর অঙ্গীকারনামা</h2>
+    <p class="body-text">স্বেচ্ছায় ও সজ্ঞানে এই মর্মে অঙ্গীকার করছি যে, বরেন্দ্র বিশ্ববিদ্যালয় কর্তৃপক্ষ কর্তৃক প্রণীত শিক্ষার্থীদের আচরণবিধি (মোট ৩০টি ধারা) সহ বর্ণিত বিশ্ববিদ্যালয়ের শৃঙ্খলা, মর্যাদা ও সুনাম অক্ষুণ্ণ রাখতে বিশ্ববিদ্যালয়ের অন্যান্য সকল বিধি-বিধান যথাযথভাবে মেনে চলতে বাধ্য থাকব। কোনো কারণে উল্লিখিত আচরণবিধি লঙ্ঘন করলে বা লঙ্ঘনে উৎসাহিত করলে, মেনে চলতে ব্যর্থ হলে, শৃঙ্খলা কমিটি বা যৌন হয়রানি ও নিপীড়ন সংক্রান্ত অভিযোগ কমিটি কর্তৃক তদন্তে অভিযোগ প্রমাণিত হলে এবং সিন্ডিকেট কর্তৃক আমার উপরে এক বা একাধিক শাস্তি প্রদত্ত হলে, আমি তা মানতে বাধ্য থাকবো।</p>
+    <div class="field-grid">
+      <div class="field"><b>শিক্ষার্থীর তথ্য —</b> নাম, ভর্তি পরীক্ষার রোল, পিতা, মাতা, ঠিকানা</div>
+      <div class="field"><b>অঙ্গীকারকারী শিক্ষার্থীর —</b> নাম, পরিচয়পত্র/জন্মসনদ নম্বর, বিভাগ/প্রোগ্রাম, স্বাক্ষর, তারিখ</div>
+      <div class="field"><b>সাক্ষী (অভিভাবক) —</b> নাম, মোবাইল নম্বর, স্বাক্ষর, তারিখ</div>
+      <div class="field"><b>প্রত্যয়নকারী —</b> বিভাগীয় প্রধান/কো-অর্ডিনেটর (সিল, স্বাক্ষর ও তারিখ)</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>মূল নথি থেকে ডিজিটালকৃত ও বিষয়ভিত্তিকভাবে সাজানো — অনুসন্ধানের সুবিধার্থে তৈরি। মূল, স্বাক্ষরযুক্ত কপিই একমাত্র কর্তৃত্বপূর্ণ দলিল।</footer>
+
+<script>
+const rulesData = [
+  {n:1, cat:"entry", text:"বিশ্ববিদ্যালয় প্রাঙ্গণে শিক্ষার্থীদের নির্ধারিত পরিচয়পত্রসহ বিশ্ববিদ্যালয় প্রদত্ত রিবন পরিধান করা বাধ্যতামূলক। পরিচয়পত্র ব্যতীত ক্যাম্পাসে প্রবেশ বা অবস্থান এবং কোনো বিভাগ, অফিস, প্রশাসনিক ইউনিট বা সংরক্ষিত এলাকায় অননুমোদিত প্রবেশ, প্রবেশের চেষ্টা, বহিরাগত প্রবেশ, বহিরাগতকে অনধিকার প্রবেশে সহায়তা বা বিশ্ববিদ্যালয়ের কার্যক্রমে হস্তক্ষেপের চেষ্টা নিষিদ্ধ।"},
+  {n:2, cat:"org", text:"কর্তৃপক্ষের পূর্বানুমতি এবং সংশ্লিষ্ট ডিন/বিভাগীয় প্রধান/কো-অর্ডিনেটর-এর সুপারিশ ব্যতীত যেকোনো ক্লাব, সমিতি, সংঘ গঠন ও সাংস্কৃতিক অনুষ্ঠান, সমাবেশ বা পিকনিক আয়োজন বা প্রত্যক্ষ/পরোক্ষভাবে সংশ্লিষ্ট কার্যক্রমে নিয়োজিত হওয়া যাবে না। অনলাইন প্ল্যাটফর্ম ব্যবহার করেও একই ধরনের কার্যক্রম পরিচালনার ক্ষেত্রেও এই নিয়ম প্রযোজ্য।"},
+  {n:3, cat:"political", text:"বিশ্ববিদ্যালয় প্রাঙ্গণে কোনো ধরনের প্রকাশ্য বা গোপন রাজনৈতিক কর্মকাণ্ডের সঙ্গে প্রত্যক্ষ বা পরোক্ষভাবে সম্পৃক্ত থাকা, সহায়তা করা নিষিদ্ধ (যেমন: কমিটি গঠন, প্রচার, সদস্য সংগ্রহ, মত বিনিময়, মিছিল, সভা, সমাবেশ ইত্যাদি)।"},
+  {n:4, cat:"harassment", text:"বিশ্ববিদ্যালয় প্রাঙ্গণে কারও প্রতি মৌখিক, মানসিক, মানহানিকর, শারীরিক বা যৌন হয়রানি করা যাবেনা এবং যেকোনো ধরণের সংঘর্ষ বা সহিংসতায় লিপ্ত হওয়া নিষিদ্ধ। অনলাইন প্ল্যাটফর্মেও উপরে উল্লিখিত কর্মকাণ্ড নিষিদ্ধ।"},
+  {n:5, cat:"privacy", text:"সংশ্লিষ্ট ব্যক্তির সম্মতি এবং বিশ্ববিদ্যালয় কর্তৃপক্ষের প্রয়োজনীয় অনুমতি ব্যতীত কোনো শিক্ষক, কর্মকর্তা, কর্মচারী বা শিক্ষার্থীর ছবি, ভিডিও বা অডিও অসৎ উদ্দেশ্যে গোপনে ধারণ, সংরক্ষণ, সম্পাদনা, প্রকাশ বা প্রচার করা নিষিদ্ধ; তবে বিশ্ববিদ্যালয়ের অনুমোদিত কার্যক্রমে এর ব্যতিক্রম হতে পারে।"},
+  {n:6, cat:"identity", text:"কর্তৃপক্ষের অনুমতি ব্যতীত বরেন্দ্র বিশ্ববিদ্যালয়ের নাম বা লোগো বা সংক্ষিপ্ত পরিচয় (VU, ভিইউ, ববি ইত্যাদি) ব্যবহার করে কোনো ধরনের সামাজিক, রাজনৈতিক, ধর্মীয় বা অন্য কোনো ধরনের সংগঠন কিংবা সামাজিক যোগাযোগমাধ্যমে গ্রুপ, পেজ খোলা বা সংশ্লিষ্ট কার্যক্রমে প্রত্যক্ষ/পরোক্ষভাবে নিয়োজিত হওয়া নিষিদ্ধ।"},
+  {n:7, cat:"law", text:"বিশ্ববিদ্যালয় ও বাংলাদেশের আইনশৃঙ্খলা এবং নিরাপত্তা লঙ্ঘন করে এমন কোনো কাজ করা নিষিদ্ধ। ক্যাম্পাসের অভ্যন্তরে ও বাহিরে বিশ্ববিদ্যালয়ের সুনাম ক্ষুন্ন হয় এমন কর্মকাণ্ড থেকে বিরত থাকতে হবে।"},
+  {n:8, cat:"privacy", text:"বিশ্ববিদ্যালয়ের সকল সম্পদের অনুমোদন ব্যতীত ব্যবহার, ক্ষতিসাধন বা ধ্বংস করা নিষিদ্ধ। বিশ্ববিদ্যালয়ের অভ্যন্তরীণ একাডেমিক, প্রশাসনিক বা ব্যক্তিগত সংবেদনশীল তথ্য, নথি, ভিডিও, অডিও বা অন্যান্য তথ্য অননুমোদিতভাবে সংগ্রহ, সংরক্ষণ, প্রকাশ, প্রচার বা ফাঁস করা নিষিদ্ধ।"},
+  {n:9, cat:"drugs", text:"বিশ্ববিদ্যালয় প্রাঙ্গণে ধূমপান নিষিদ্ধ। এছাড়াও, সর্বপ্রকার মাদকদ্রব্য বা নেশাজাতীয় দ্রব্য বহন, গ্রহণ, সেবন ও বিতরণ কার্যক্রমে প্রত্যক্ষ/পরোক্ষভাবে নিয়োজিত/সম্পৃক্ত থাকা নিষিদ্ধ। বিশ্ববিদ্যালয় প্রাঙ্গণ বা বিশ্ববিদ্যালয় সংশ্লিষ্ট কোনো কার্যক্রমে মাদকাসক্ত বা নেশাগ্রস্ত অবস্থায় উপস্থিত হওয়া নিষিদ্ধ।"},
+  {n:10, cat:"weapons", text:"বিশ্ববিদ্যালয়ে প্রবেশ বা অবস্থানকালে কোনো ধরনের অস্ত্র, বেআইনি, ক্ষতিকর, বিপজ্জনক বা জনিনরাপত্তার জন্য হুমকিস্বরূপ সামগ্রী (যেমন দাহ্য পদার্থ, বিস্ফোরক, ধারালো অস্ত্র, রাসায়নিক বা আপত্তিকর উপকরণ ইত্যাদি) বহন, সংরক্ষণ বা ব্যবহার করা এবং কর্তৃপক্ষের অনুমতি ব্যতীত ড্রোন, নজরদারি যন্ত্র বা অনুরূপ প্রযুক্তির মাধ্যমে ছবি বা ভিডিও ধারণ করা নিষিদ্ধ।"},
+  {n:11, cat:"conduct", text:"বিশ্ববিদ্যালয়ের সকল শিক্ষক, কর্মকর্তা, সহপাঠী ও কর্মচারীর প্রতি সম্মানজনক আচরণ করতে হবে। কারও প্রতি কোনো প্রকার প্রশ্ন বা ক্ষোভ/অভিযোগ থাকলে তা নিয়মতান্ত্রিক উপায়ে যথাযথ কর্তৃপক্ষের মাধ্যমে উপস্থাপন করতে হবে। আবেগপ্রসূত বা ব্যক্তিগত মন্তব্য নিষিদ্ধ। বিশ্ববিদ্যালয় সংশ্লিষ্ট যেকোন প্রস্তাবনা, পরামর্শ, অভিযোগ ইত্যাদি বিশ্ববিদ্যালয় কর্তৃপক্ষের নিকট দাখিল-এর জন্য নির্ধারিত মাধ্যম ব্যতীত অননুমোদিত মাধ্যম ব্যবহার নিষিদ্ধ।"},
+  {n:12, cat:"exam", text:"শিক্ষার্থী মূল্যায়ন প্রক্রিয়ায় (মিডটার্ম/ফাইনাল পরীক্ষা, ক্লাস টেস্ট, ল্যাব টেস্ট, ভাইভা, প্রেজেন্টেশন ইত্যাদি) কোনো ধরনের অসদুপায় অবলম্বন বা অসদাচরণ নিষিদ্ধ।"},
+  {n:13, cat:"campus-life", text:"পরিচ্ছার, শালীন ও মার্জিত পোশাক পরিধান করে বিশ্ববিদ্যালয় প্রাঙ্গণে যাবতীয় কার্যক্রমে অংশগ্রহণ করা বাঞ্ছনীয়।"},
+  {n:14, cat:"campus-life", text:"বিশ্ববিদ্যালয়ের পরিচ্ছন্নতা নষ্ট করে এমন সকল কাজ যেমন বিশ্ববিদ্যালয় ভবন/শ্রেণিকক্ষের দেয়ালে, বেঞ্চে, হোয়াইট বোর্ডে কোনো কিছু লেখা বা ছবি অঙ্কন করা নিষিদ্ধ। প্রত্যেক শিক্ষার্থীর বিশ্ববিদ্যালয় প্রাঙ্গণ পরিষ্কার-পরিচ্ছন্ন রাখতে যত্নবান হওয়া বাঞ্ছনীয় এবং নির্ধারিত ডাস্টবিন ব্যবহার বাধ্যতামূলক। লাইব্রেরি, ল্যাবরেটরি, ক্লাব, শ্রেণিকক্ষ, গবেষণাগার এবং বিশ্ববিদ্যালয়ের একাডেমিক ও নন-একাডেমিক সম্পদ বা রিসোর্স-এর অপব্যবহার, ক্ষতিসাধন, চুরি অথবা সংশ্লিষ্ট নীতিমালা ও বিধি-বিধান লঙ্ঘন করা নিষিদ্ধ।"},
+  {n:15, cat:"law", text:"বিশ্ববিদ্যালয়ের বাইরে কোনো প্রকার অপরাধমূলক কর্মকাণ্ডে জড়িত থাকার অভিযোগ প্রমাণিত হলে বিশ্ববিদ্যালয় কর্তৃপক্ষ যথাযথ ব্যবস্থা নিতে পারে। কোনো অভিযোগ, তদন্ত বা শৃঙ্খলাজনিত কার্যক্রমে অভিযোগকারী, সাক্ষী বা সংশ্লিষ্ট ব্যক্তিকে ভয়ভীতি প্রদর্শন, প্রভাবিত করা, প্রতিশোধমূলক আচরণ বা হয়রানি করা এবং প্রমাণ নষ্ট, গোপন, পরিবর্তন বা তদন্তে বাধা সৃষ্টি করা নিষিদ্ধ।"},
+  {n:16, cat:"protest", text:"প্রতিবাদ বা প্রতিরোধের নামে সমাবেশ বা ধর্মঘট বা ক্লাস/পরীক্ষা বর্জনের নামে কোনো বিশৃঙ্খল আচরণের মাধ্যমে বিশ্ববিদ্যালয়ের স্বাভাবিক কার্যক্রম ও শৃঙ্খলা বিঘ্ন ঘটানো নিষিদ্ধ।"},
+  {n:17, cat:"campus-life", text:"কর্তৃপক্ষের অনুমতি ছাড়া নির্ধারিত দিন ও সময়ের বাইরে বিশ্ববিদ্যালয় ক্যাম্পাসে অবস্থান করা নিষিদ্ধ।"},
+  {n:18, cat:"transport", text:"বিশ্ববিদ্যালয়ের পরিবহন ব্যবহারকালে শিক্ষার্থীদের দায়িত্বশীল ও শৃঙ্খলাপূর্ণ আচরণ করতে হবে। পরিবহন কর্মীদের অননুমোদিত স্থানে যানবাহন থামাতে বাধ্য করা, অযৌক্তিক চাপ প্রয়োগ করা অথবা তাদের সঙ্গে কোনো ধরনের অসদাচরণ করা সম্পূর্ণ নিষিদ্ধ।"},
+  {n:19, cat:"transport", text:"কর্তৃপক্ষের অনুমতি ব্যতীত বিশ্ববিদ্যালয় ক্যাম্পাসের অনির্ধারিত স্থানে বা এলোমেলোভাবে কোনো ধরনের যানবাহন (সাইকেল, মোটরসাইকেল, কার ইত্যাদি) পার্ক করা নিষিদ্ধ।"},
+  {n:20, cat:"org", text:"বরেন্দ্র বিশ্ববিদ্যালয়ের শিক্ষার্থীদের জন্য কর্তৃপক্ষের অনুমোদন ব্যতীত কোনো এলাকা-ভিত্তিক বা বিভাগীয় সমিতি, ক্লাব বা অনুরূপ সংগঠন গঠন, পরিচালনা কিংবা এ ধরনের কার্যক্রমে প্রত্যক্ষ/পরোক্ষভাবে নিয়োজিত/সম্পৃক্ত থাকা নিষিদ্ধ।"},
+  {n:21, cat:"harassment", text:"কোনো জাতি, ধর্ম, বর্ণ, জেন্ডার পরিচয়, জাতিগত পরিচয় বা সম্প্রদায়ের প্রতি অসম্মানজনক মন্তব্য, বৈষম্যমূলক আচরণ কিংবা বিদ্বেষমূলক কার্যক্রম নিষিদ্ধ। প্রতিবন্ধী ব্যক্তি, বিশেষ চাহিদাসম্পন্ন ব্যক্তি এবং সকল শিক্ষার্থীর প্রতি সহনশীল, অন্তর্ভুক্তিমূলক, মর্যাদাপূর্ণ ও সহানুভূতিশীল আচরণ করা বাঞ্ছনীয়।"},
+  {n:22, cat:"political", text:"দেশের আইনশৃঙ্খলা, সার্বভৌমত্ব বা সাম্প্রদায়িক/ধর্মীয় সম্প্রীতি বিনষ্ট করে এমন কার্যক্রম, চরমপন্থা, জঙ্গিবাদ, উগ্রবাদ বা রাষ্ট্র কর্তৃক নিষিদ্ধ ঘোষিত কোনো ব্যক্তি, সংগঠন বা গোষ্ঠীর কার্যক্রম, প্রচারণা, সদস্য সংগ্রহ, সমর্থন বা সহযোগিতায় প্রত্যক্ষ বা পরোক্ষভাবে সম্পৃক্ত থাকা নিষিদ্ধ।"},
+  {n:23, cat:"conduct", text:"উদ্দেশ্যপ্রণোদিতভাবে কোনো শিক্ষার্থী অন্য কোনো শিক্ষার্থী, শিক্ষক, কর্মকর্তা, কর্মচারী বা বিশ্ববিদ্যালয় সংশ্লিষ্ট যেকোনো ব্যক্তির বিরুদ্ধে হয়রানিমূলক, মিথ্যা, বিভ্রান্তিকর অভিযোগ দায়ের করতে পারবে না।"},
+  {n:24, cat:"fraud", text:"বরেন্দ্র বিশ্ববিদ্যালয়ের স্বার্থসংশ্লিষ্ট বা অন্য কোনো বিষয়ে জালিয়াতি, প্রতারণা, তথ্য গোপন, অসদুপায় অবলম্বন বা সহায়তা করা এবং বিশ্ববিদ্যালয়ের নাম, লোগো, পরিচয়পত্র, লেটারহেড, সনদপত্র, সিল বা অন্য কোনো পরিচয়চিহ্ন জাল, অপব্যবহার বা ব্যক্তিগত স্বার্থে ব্যবহার করা নিষিদ্ধ। ভর্তি, বৃত্তি, পরীক্ষা, একাডেমিক বা প্রশাসনিক কার্যক্রমে ভুল তথ্য, ভুয়া পরিচয়, জাল নথি বা বিভ্রান্তিকর তথ্য প্রদান, ব্যবহার নিষিদ্ধ। বিশ্ববিদ্যালয় সংক্রান্ত যেকোনো ডকুমেন্ট যেমন: পে-স্লিপ (ফি প্রদানের রশিদ), রেজিস্ট্রেশন, প্রবেশপত্র, পরিচয়পত্র, নথি, পত্র, সর্বপ্রকার সনদ, প্রত্যয়ন ইত্যাদি নকল বা জালিয়াতি শাস্তিযোগ্য অপরাধ বলে বিবেচিত হবে।"},
+  {n:25, cat:"harassment", text:"বিশ্ববিদ্যালয় প্রাঙ্গণ, পরিবহন, অনলাইন প্ল্যাটফর্ম বা বিশ্ববিদ্যালয় সংশ্লিষ্ট যেকোনো কার্যক্রমে র‍্যাগিং, বুলিং, ইভটিজিং, ভয়ভীতি প্রদর্শন, অপমানজনক আচরণ বা মানসিক নির্যাতনে লিপ্ত হওয়া নিষিদ্ধ। বিশ্ববিদ্যালয় প্রাঙ্গণ বা বিশ্ববিদ্যালয় সংশ্লিষ্ট কার্যক্রমে জুয়া, অনলাইন বেটিং, অর্থের বিনিময়ে অবৈধ লেনদেন, প্রতারণামূলক আর্থিক কার্যক্রম বা অর্থ আদায়ে জড়িত থাকা নিষিদ্ধ।"},
+  {n:26, cat:"campus-life", text:"বিশ্ববিদ্যালয় কর্তৃপক্ষের পূর্বানুমতি ব্যতীত কোনো ধরনের পোষা প্রাণী বা অন্য কোনো প্রাণী বিশ্ববিদ্যালয় প্রাঙ্গণে বহন বা প্রবেশ করানো নিষিদ্ধ।"},
+  {n:27, cat:"fraud", text:"একাডেমিক বা প্রশাসনিক কার্যক্রমে রাজনৈতিক, অরাজনৈতিক বা অন্য কোনো মাধ্যমে অবৈধ প্রভাব, তদবির, চাপ, হস্তক্ষেপ করা যাবে না এবং অনৈতিক সুবিধা (ঘুষ, উপঢৌকন) প্রদান, গ্রহণ, প্রভাব করা কিংবা এ ধরনের কার্যক্রমে সহায়তা করা নিষিদ্ধ।"},
+  {n:28, cat:"tech", text:"বিশ্ববিদ্যালয়ের অনুমোদন ব্যতীত কৃত্রিম বুদ্ধিমত্তা (AI) বা অন্য কোনো প্রযুক্তিগত মাধ্যম ব্যবহার করে পরীক্ষা, অ্যাসাইনমেন্ট, গবেষণা, মূল্যায়ন বা একাডেমিক কার্যক্রমে প্রতারণা, অসদুপায় অবলম্বন বা প্রক্রিয়াকে প্রভাবিত করা এবং বিশ্ববিদ্যালয়ের Wi-Fi, ই-মেইল, সার্ভার, ডিজিটাল সিস্টেম বা তথ্যপ্রযুক্তি অবকাঠামোতে হ্যাকিং, অননুমোদিত প্রবেশ, পাসওয়ার্ড শেয়ারিং, পরিচয় গোপনে প্রবেশ, সাইবার আক্রমণ বা বিশ্ববিদ্যালয়ের ডিজিটাল কাঠামো/সুবিধা ব্যবহার করে বেআইনি কার্যক্রম পরিচালনা করা নিষিদ্ধ।"},
+  {n:29, cat:"safety", text:"অগ্নিনিরাপত্তা, দুর্যোগ ব্যবস্থাপনা, নিরাপত্তা, স্বাস্থ্যবিধি বা বিশ্ববিদ্যালয় কর্তৃক জারিকৃত যেকোনো নোটিশ, নির্দেশনা ও যেকোনো বিধি-নিষেধ মেনে চলা বাধ্যতামূলক।"},
+  {n:30, cat:"tech", text:"ক্যাম্পাসে অশালীন, আপত্তিকর ও দৃষ্টিকটু কন্টেন্ট তৈরি করাসহ সামাজিক যোগাযোগ মাধ্যমে এই ধরনের কন্টেন্ট প্রচার করা নিষিদ্ধ।"},
+];
+
+const categories = [
+  {id:"entry",       icon:"🪪", bn:"প্রবেশ ও পরিচয়পত্র",              en:"Entry & ID"},
+  {id:"org",         icon:"🎪", bn:"সংগঠন ও ক্লাব কার্যক্রম",           en:"Organizations"},
+  {id:"political",   icon:"🚫", bn:"রাজনৈতিক ও চরমপন্থা-বিরোধী",        en:"Political / Extremism"},
+  {id:"harassment",  icon:"🤝", bn:"হয়রানি, সহিংসতা ও বৈষম্য",         en:"Harassment & Discrimination"},
+  {id:"privacy",     icon:"🔒", bn:"গোপনীয়তা, তথ্য ও সম্পদ সুরক্ষা",   en:"Privacy & Assets"},
+  {id:"identity",    icon:"🏷️", bn:"নাম ও লোগোর ব্যবহার",              en:"Name & Logo Use"},
+  {id:"law",         icon:"⚖️", bn:"আইন, তদন্ত ও সুনাম",               en:"Law & Investigations"},
+  {id:"drugs",       icon:"🚭", bn:"মাদক ও ধূমপান",                   en:"Drugs & Smoking"},
+  {id:"weapons",     icon:"⚠️", bn:"অস্ত্র ও বিপজ্জনক সামগ্রী",         en:"Weapons & Hazards"},
+  {id:"conduct",     icon:"💬", bn:"আচরণ, শ্রদ্ধা ও অভিযোগ প্রক্রিয়া", en:"Conduct & Grievances"},
+  {id:"exam",        icon:"📝", bn:"পরীক্ষা ও মূল্যায়ন",              en:"Exams & Assessment"},
+  {id:"campus-life", icon:"🌿", bn:"পোশাক, পরিচ্ছন্নতা ও ক্যাম্পাস জীবন", en:"Campus Life"},
+  {id:"protest",     icon:"📣", bn:"প্রতিবাদ ও শৃঙ্খলা বিঘ্ন",          en:"Protests & Disruption"},
+  {id:"transport",   icon:"🚌", bn:"পরিবহন ও পার্কিং",                 en:"Transport & Parking"},
+  {id:"fraud",       icon:"🎭", bn:"প্রতারণা, জালিয়াতি ও ঘুষ",         en:"Fraud & Bribery"},
+  {id:"tech",        icon:"💻", bn:"প্রযুক্তি, AI ও অনলাইন আচরণ",      en:"Technology, AI & Online Conduct"},
+  {id:"safety",      icon:"🧯", bn:"নিরাপত্তা ও নির্দেশনা পালন",        en:"Safety Compliance"},
+];
+
+const container = document.getElementById('rulesContainer');
+const chipRow = document.getElementById('chipRow');
+const searchInput = document.getElementById('searchInput');
+const resultCount = document.getElementById('resultCount');
+const noResults = document.getElementById('noResults');
+
+// build chip filter row
+let activeCat = 'all';
+const allChip = document.createElement('div');
+allChip.className = 'chip active';
+allChip.textContent = 'সব ধারা';
+allChip.dataset.cat = 'all';
+chipRow.appendChild(allChip);
+categories.forEach(c=>{
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.textContent = c.bn;
+  chip.dataset.cat = c.id;
+  chipRow.appendChild(chip);
+});
+chipRow.addEventListener('click', e=>{
+  if(!e.target.classList.contains('chip')) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');
+  activeCat = e.target.dataset.cat;
+  render();
+});
+
+// build category sections
+function buildDOM(){
+  categories.forEach(cat=>{
+    const rules = rulesData.filter(r=>r.cat===cat.id);
+    if(rules.length===0) return;
+    const section = document.createElement('section');
+    section.className = 'category';
+    section.dataset.cat = cat.id;
+    section.innerHTML = `
+      <div class="category-head">
+        <span class="category-dot">${cat.icon}</span>
+        <h2>${cat.bn}</h2>
+        <span class="en">${cat.en}</span>
+      </div>
+      <div class="rule-list"></div>
+    `;
+    const list = section.querySelector('.rule-list');
+    rules.forEach(r=>{
+      const div = document.createElement('div');
+      div.className = 'rule';
+      div.dataset.n = r.n;
+      div.dataset.cat = r.cat;
+      div.innerHTML = `<div class="rule-num">${toBanglaNum(r.n)}</div><div class="rule-text">${r.text}</div>`;
+      list.appendChild(div);
+    });
+    container.appendChild(section);
+  });
+}
+
+function toBanglaNum(n){
+  const digits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  return String(n).split('').map(d=>digits[+d]).join('');
+}
+
+function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function render(){
+  const q = searchInput.value.trim();
+  let visibleCount = 0;
+  document.querySelectorAll('.category').forEach(section=>{
+    let sectionHasVisible = false;
+    section.querySelectorAll('.rule').forEach(ruleEl=>{
+      const n = ruleEl.dataset.n;
+      const cat = ruleEl.dataset.cat;
+      const data = rulesData.find(r=>r.n==n);
+      const matchesCat = (activeCat==='all' || activeCat===cat);
+      const matchesQuery = q==='' || data.text.includes(q);
+      const textEl = ruleEl.querySelector('.rule-text');
+      if(matchesCat && matchesQuery){
+        ruleEl.classList.remove('hidden');
+        sectionHasVisible = true;
+        visibleCount++;
+        if(q){
+          const re = new RegExp(escapeRegex(q), 'g');
+          textEl.innerHTML = data.text.replace(re, m=>`<mark>${m}</mark>`);
+        } else {
+          textEl.innerHTML = data.text;
+        }
+      } else {
+        ruleEl.classList.add('hidden');
+      }
+    });
+    section.style.display = sectionHasVisible ? '' : 'none';
+  });
+  noResults.style.display = visibleCount===0 ? 'block' : 'none';
+  resultCount.textContent = q || activeCat!=='all'
+    ? `${toBanglaNum(visibleCount)}টি ধারা পাওয়া গেছে`
+    : `সর্বমোট ৩০টি ধারা`;
+}
+
+buildDOM();
+render();
+searchInput.addEventListener('input', render);
+</script>
+</body>
+</html>
 
