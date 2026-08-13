@@ -1,1 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCQ Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<!-- ============ SCREEN 1 : START ============ -->
+<section id="screen-start" class="screen active">
+  <div class="sheet-card start-card">
+    <p class="eyebrow">Answer Sheet · OMR Format</p>
+    <h1 class="title">MCQ Test</h1>
+    <p class="sub" id="start-sub">Loading question paper…</p>
+
+    <div class="rules" id="rules-box" hidden>
+      <div class="rule"><span class="rule-label">Questions</span><span class="rule-val" id="rule-count">—</span></div>
+      <div class="rule"><span class="rule-label">Overall time</span><span class="rule-val" id="rule-time">—</span></div>
+      <div class="rule"><span class="rule-label">Per question</span><span class="rule-val" id="rule-perq">—</span></div>
+      <div class="rule"><span class="rule-label">Marking</span><span class="rule-val" id="rule-marking">—</span></div>
+    </div>
+
+    <input type="text" id="candidate-name" placeholder="Enter your name" maxlength="40">
+    <button id="btn-start" class="btn-primary" disabled>Begin Test</button>
+    <p class="error-text" id="start-error" hidden></p>
+  </div>
+</section>
+
+<!-- ============ SCREEN 2 : QUIZ ============ -->
+<section id="screen-quiz" class="screen">
+  <header class="quiz-topbar">
+    <div class="topbar-left">
+      <span class="paper-mark">MCQ TEST</span>
+    </div>
+    <div class="topbar-timers">
+      <div class="timer-block">
+        <span class="timer-label">Question</span>
+        <span class="timer-ring" id="ring-question"><span id="time-question">60</span></span>
+      </div>
+      <div class="timer-block">
+        <span class="timer-label">Overall</span>
+        <span class="timer-overall" id="time-overall">30:00</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="quiz-body">
+    <nav class="navigator" id="navigator" aria-label="Question navigator"></nav>
+
+    <main class="question-panel">
+      <div class="q-meta">
+        <span class="q-index" id="q-index">Q1 of 10</span>
+        <span class="q-status" id="q-status">Not answered</span>
+      </div>
+      <h2 class="q-text" id="q-text">Question text goes here</h2>
+
+      <div class="omr-options" id="omr-options"><!-- injected --></div>
+
+      <div class="q-actions">
+        <button id="btn-clear" class="btn-ghost">Clear response</button>
+        <div class="q-actions-right">
+          <button id="btn-prev" class="btn-ghost">← Prev</button>
+          <button id="btn-next" class="btn-primary">Next →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="quiz-footer">
+    <button id="btn-submit" class="btn-danger">Submit Test</button>
+  </footer>
+</section>
+
+<!-- ============ SCREEN 3 : RESULT ============ -->
+<section id="screen-result" class="screen">
+  <div class="sheet-card result-card">
+    <p class="eyebrow">Result</p>
+    <h1 class="title" id="result-name">—</h1>
+
+    <div class="score-block">
+      <span class="score-number" id="score-number">0</span>
+      <span class="score-max" id="score-max">/ 0</span>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><span class="stat-num" id="stat-correct">0</span><span class="stat-label correct">Correct</span></div>
+      <div class="stat"><span class="stat-num" id="stat-wrong">0</span><span class="stat-label wrong">Wrong</span></div>
+      <div class="stat"><span class="stat-num" id="stat-skipped">0</span><span class="stat-label skipped">Skipped</span></div>
+    </div>
+
+    <p class="save-status" id="save-status">Saving result…</p>
+
+    <div class="review-list" id="review-list"></div>
+
+    <button id="btn-restart" class="btn-primary">Take Again</button>
+  </div>
+</section>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
