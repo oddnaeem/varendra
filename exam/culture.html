@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOL 101: Culture - Tree Learning Mindmap</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --panel-bg: #1e293b;
+            --node-border: #334155;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --line-color: #475569;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        /* Top Header Control */
+        .controls {
+            max-width: 1100px;
+            margin: 0 auto 2rem auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background-color: var(--panel-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--node-border);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Tree Structure Styling */
+        .tree-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        ul.tree, ul.tree ul {
+            list-style-type: none;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        /* Tree connecting lines */
+        ul.tree ul::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0.75rem;
+            width: 2px;
+            background-color: var(--line-color);
+        }
+
+        ul.tree li {
+            position: relative;
+            margin: 0.75rem 0;
+        }
+
+        ul.tree li::before {
+            content: "";
+            position: absolute;
+            top: 1.25rem;
+            left: -0.75rem;
+            width: 0.75rem;
+            height: 2px;
+            background-color: var(--line-color);
+        }
+
+        /* Branch Node Cards */
+        .node {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--node-border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            display: inline-block;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            max-width: 100%;
+        }
+
+        .node:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .node-title {
+            font-weight: 700;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle-icon {
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* Leaf Details Box */
+        .details {
+            margin-top: 0.5rem;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        /* Tags and badges */
+        .badge {
+            display: inline-block;
+            background-color: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            border: 1px solid rgba(165, 180, 252, 0.3);
+        }
+
+        /* Collapsing functionality */
+        .collapsed > ul {
+            display: none !important;
+        }
+
+        .root-node {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.1));
+        }
+
+        .root-node .node-title {
+            font-size: 1.25rem;
+            color: #fff;
+        }
+
+        /* Highlight specifics */
+        .ref-item {
+            font-style: italic;
+            border-left: 2px solid var(--secondary);
+            padding-left: 0.5rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <div>
+            <h1 style="font-size: 1.2rem;">AOL 101: Art of Living — Tree Learning Tree</h1>
+            <p style="font-size: 0.85rem; color: var(--text-dim);">Instructor: Sudipto Das Shuvo | Dept. of NFE, Varendra University</p>
+        </div>
+        <div>
+            <button class="btn" onclick="expandAll()">Expand All</button>
+            <button class="btn btn-outline" onclick="collapseAll()">Collapse All</button>
+        </div>
+    </div>
+
+    <div class="tree-container">
+        <ul class="tree">
+            <li>
+                <!-- ROOT NODE -->
+                <div class="node root-node" onclick="toggleNode(this.parentElement)">
+                    <span class="node-title"><span class="toggle-icon">[-]</span> TOPIC: CULTURE (AOL 101)</span>
+                    <span class="details">Complete, slide-by-slide curriculum hierarchy. Click any branch to expand/collapse.</span>
+                </div>
+
+                <ul>
+                    <!-- BRANCH 1: DEFINITION -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 1. Definition of Culture <span class="badge">Slide 2</span></span>
+                            <div class="details">
+                                <strong>Edward Tylor's Definition:</strong> "Culture refers to that complex whole which includes knowledge, beliefs, art, morals, law, customs, and any other capabilities and habits acquired by man as a member of society."
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- BRANCH 2: TYPES OF CULTURE -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 2. Types of Culture <span class="badge">Slides 3-4</span></span>
+                        </div>
+                        <ul>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Material Culture</span>
+                                    <div class="details">
+                                        • <strong>Definition:</strong> Concrete and tangible things created and used by humans.<br>
+                                        • <strong>Range:</strong> Prehistoric stone tools of primitive man to modern advanced computers.<br>
+                                        • <strong>Examples:</strong> Books, buildings, physical objects used by future generations to understand us.
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Non-Material Culture</span>
+                                    <div class="details">
+                                        • <strong>Definition:</strong> Words used, habits followed, ideas, customs, behaviors professes/conformed to.<br>
+                                        • <strong>Includes:</strong> Laws, techniques, lifestyle, and knowledge.<br>
+                                        • <strong>Examples:</strong> Beliefs, values, religions, ethics, and philosophies.
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- BRANCH 3: CHARACTERISTICS OF CULTURE -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 3. Characteristics of Culture <span class="badge">Slides 5-7</span></span>
+                        </div>
+                        <ul>
+                            <li><div class="node"><span class="node-title">• Culture is learned and acquired</span></div></li>
+                            <li><div class="node"><span class="node-title">• Culture is shared and transmitted</span></div></li>
+                            <li><div class="node"><span class="node-title">• Culture is social</span></div></li>
+                            <li><div class="node"><span class="node-title">• Culture is symbolic</span></div></li>
+                            <li><div class="node"><span class="node-title">• Culture tends toward integration</span></div></li>
+                            <li><div class="node"><span class="node-title">• Culture is cumulative</span></div></li>
+                            <li><div class="node"><span class="node-title">• Culture varies from society to society</span></div></li>
+                            <li><div class="node"><span class="node-title">• Culture keeps on changing</span></div></li>
+                        </ul>
+                    </li>
+
+                    <!-- BRANCH 4: COMPONENTS OF CULTURE -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 4. Components of Culture <span class="badge">Slides 8-12</span></span>
+                        </div>
+                        <ul>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">1. Symbols</span>
+                                    <div class="details">Anything carrying a particular recognized meaning. Meaning varies across societies, within a society, and over time.</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">2. Language</span>
+                                    <div class="details">
+                                        • System of symbols allowing communication (written, spoken, or non-verbal).<br>
+                                        • Key to <strong>Cultural Transmission</strong> (passing culture across generations; historically oral tradition).<br>
+                                        • <strong>Cultural Variation Examples:</strong><br>
+                                          &nbsp;&nbsp;- U.S.: Number 13 = bad luck (high-rises skip 13th floor).<br>
+                                          &nbsp;&nbsp;- Japan: Number 4 = unlucky (pronounced like 'death').
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">3. Ideas, Beliefs, & Values</span>
+                                    <div class="details">
+                                        • <strong>Ideas:</strong> Non-material conceptions of physical, social, and cultural world.<br>
+                                        • <strong>Beliefs:</strong> Personal convictions about a certain idea.<br>
+                                        • <strong>Values:</strong> Abstract concepts of what is important/worthwhile (general standards of good/bad).
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">4. Norms</span>
+                                    <div class="details">
+                                        • Behaviors reflecting compliance with defined standards of propriety, morality, legality, ethics.<br>
+                                        • Dictate actions in specific situations.<br>
+                                        • Enforced via <strong>sanctions</strong> when violated (e.g., law).
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">5. Material Culture</span>
+                                    <div class="details">Including physical infrastructure and technology.</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- BRANCH 5: CULTURAL INTEGRATION & BANGLADESH -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 5. Cultural Integration & Local Context <span class="badge">Slides 13-14</span></span>
+                        </div>
+                        <ul>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Cultural Integration Definition</span>
+                                    <div class="details">Exchange where one group assumes beliefs/rituals of another without losing its own culture (e.g., U.S. adopting Italian pizza, Mexican tacos, Chinese food).</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Bangladesh Case Studies</span>
+                                    <div class="details">
+                                        • <strong>Linguistic Unity:</strong> Bangla language unites people regardless of geography (Sylhet to Khulna).<br>
+                                        • <strong>National Festivals:</strong> <em>Pahela Baishakh</em> as an ultimate <strong>Secular Festival</strong> (non-religious celebration where Muslims, Hindus, Buddhists, Christians celebrate together).
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- BRANCH 6: CULTURAL VARIATION & CULTURE SHOCK -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 6. Cultural Variation & Culture Shock <span class="badge">Slides 15-17</span></span>
+                        </div>
+                        <ul>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Cultural Variation</span>
+                                    <div class="details">Rich diversity in social patterns (music, cuisine, dance). <em>Example:</em> Western firm handshake vs. Japanese bow.</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Culture Shock & Stressors</span>
+                                    <div class="details">
+                                        Multifaceted stress experience in contact with a new culture (common among refugees/students) [Dodge, 1990].<br>
+                                        • <strong>Reasons:</strong> Previous experiences, cultural distance degree, preparation level, support networks, individual psychology.
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">The "W" Curve Model (Process of Adjustment)</span>
+                                    <div class="details">
+                                        Home Country → Leaving Home → Arrival in Host Country → Culture Shock → Feeling Unhappy → Adjusting → Completion of Studies → Leaving Host Country → Arrival Back Home → Reverse Culture Shock → Re-Adjusting → Adaptation to Life in Home Country.
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- BRANCH 7: CULTURAL EVALUATION PERSPECTIVES -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 7. Cultural Evaluation Perspectives <span class="badge">Slides 18-21</span></span>
+                        </div>
+                        <ul>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Ethnocentrism</span>
+                                    <div class="details">Regarding one's own culture as the center/superior. <em>Example:</em> City dwellers incorrectly seeing rural people as "uncultured".</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Xenocentrism</span>
+                                    <div class="details">Believing one's culture is inferior compared to others. <em>Example:</em> Idealizing Paris fashion, assuming French products are inherently better.</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="node">
+                                    <span class="node-title">Cultural Relativism & Its 4 Advantages</span>
+                                    <div class="details">
+                                        Assessing a culture by its own standards/local context (e.g., eating insects as a delicacy).<br>
+                                        • <strong>Advantage 1:</strong> Promotes cooperation (stronger societal bonds).<br>
+                                        • <strong>Advantage 2:</strong> Encourages respect & equality.<br>
+                                        • <strong>Advantage 3:</strong> Preserves human cultures.<br>
+                                        • <strong>Advantage 4:</strong> Creates a non-judgmental society.
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- BRANCH 8: REFERENCES -->
+                    <li>
+                        <div class="node" onclick="toggleNode(this.parentElement)">
+                            <span class="node-title"><span class="toggle-icon">[-]</span> 8. Academic References <span class="badge">Slide 22</span></span>
+                        </div>
+                        <ul>
+                            <li><div class="node"><div class="details ref-item">Bottomore, T. B. (1964). Sociology: A Guide to Problems and Literature. London: George Allen & Unwin.</div></div></li>
+                            <li><div class="node"><div class="details ref-item">Henslin, J. M. (2004). Sociology: a down-to-earth approach (3rd ed.). NSW: Pearson Australia.</div></div></li>
+                            <li><div class="node"><div class="details ref-item">Giddens, A. (2009). Sociology (6th ed.). Cambridge: Polity Press.</div></div></li>
+                            <li><div class="node"><div class="details ref-item">Inkles, A. (1964). What Is Sociology? An Introduction to the Discipline and Profession (7th ed.). Prentice Hall.</div></div></li>
+                            <li><div class="node"><div class="details ref-item">MacIver, R. M., & Page, C. H. (1965). Society. London: Macmillan and Company.</div></div></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        function toggleNode(liElement) {
+            // Prevent event from bubbling up to parent nodes
+            event.stopPropagation();
+            
+            if (liElement.querySelector('ul')) {
+                liElement.classList.toggle('collapsed');
+                const icon = liElement.querySelector('.toggle-icon');
+                if (icon) {
+                    icon.textContent = liElement.classList.contains('collapsed') ? '[+]' : '[-]';
+                }
+            }
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.tree li').forEach(li => {
+                li.classList.remove('collapsed');
+                const icon = li.querySelector('.toggle-icon');
+                if (icon) icon.textContent = '[-]';
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.tree li').forEach(li => {
+                // Don't collapse the root element completely, keep first level visible
+                if (!li.parentElement.classList.contains('tree')) {
+                    li.classList.add('collapsed');
+                    const icon = li.querySelector('.toggle-icon');
+                    if (icon) icon.textContent = '[+]';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
