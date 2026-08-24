@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AOL 101 — Root & Branch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --ink:#1b2a20;
+    --paper:#ffffff;
+    --bark:#2f5233;
+    --bark-soft:#4a6e4f;
+    --moss:#8fae8b;
+    --amber:#b9762f;
+    --line:#d8ded6;
+    --line-soft:#e9ede7;
+    --text-dim:#5b6960;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.55;
+    padding-bottom:80px;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding:38px 20px 26px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--bark);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(28px,7vw,40px);
+    margin:0 0 6px;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    font-size:14px;
+    color:var(--text-dim);
+    max-width:46ch;
+  }
+  .meta{
+    margin-top:18px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .meta span{white-space:nowrap;}
+  .meta b{color:var(--ink); font-weight:600;}
+
+  .toolbar{
+    display:flex;
+    gap:8px;
+    padding:14px 20px;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(8px);
+    z-index:20;
+  }
+  .toolbar button{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    padding:8px 13px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--bark);
+    cursor:pointer;
+  }
+  .toolbar button:active{transform:scale(0.97);}
+  .toolbar .progress{
+    margin-left:auto;
+    align-self:center;
+    font-size:12px;
+    color:var(--text-dim);
+  }
+
+  /* ---------- Tree ---------- */
+  .tree{
+    padding:22px 18px 10px;
+    max-width:720px;
+    margin:0 auto;
+  }
+  .node{
+    position:relative;
+  }
+  .node > .row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:13px 10px;
+    border-radius:10px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .node > .row:active{background:var(--line-soft);}
+
+  .twisty{
+    flex:0 0 22px;
+    width:22px;height:22px;
+    border-radius:6px;
+    background:var(--line-soft);
+    display:flex;align-items:center;justify-content:center;
+    margin-top:2px;
+    transition:transform .25s ease, background .2s ease;
+    color:var(--bark);
+  }
+  .twisty svg{width:11px;height:11px;transition:transform .25s ease;}
+  .node.open > .row > .twisty{background:var(--bark);color:#fff;}
+  .node.open > .row > .twisty svg{transform:rotate(90deg);}
+
+  .node.leaf > .row > .twisty{opacity:0;}
+
+  .label{
+    flex:1;
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:16.5px;
+    color:var(--ink);
+    padding-top:1px;
+  }
+  .node[data-depth="1"] > .row > .label{
+    font-size:19px;
+    font-weight:600;
+  }
+  .tag{
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--amber);
+    font-weight:700;
+    margin-left:6px;
+  }
+
+  .children{
+    margin-left:20px;
+    padding-left:14px;
+    border-left:1.5px solid var(--line);
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .node.open > .children{ /* height set via JS */ }
+
+  .leaf-body{
+    padding:2px 12px 16px 42px;
+    font-size:14.8px;
+    color:#33403a;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .node.open > .leaf-body{ }
+
+  .leaf-body p{margin:0 0 10px;}
+  .leaf-body ul{margin:0 0 10px; padding-left:18px;}
+  .leaf-body li{margin-bottom:7px;}
+  .leaf-body .quote{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:15.5px;
+    color:var(--bark);
+    border-left:2px solid var(--moss);
+    padding-left:12px;
+    margin:6px 0 10px;
+  }
+  .leaf-body .attrib{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-style:normal;
+    font-size:12px;
+    color:var(--text-dim);
+    margin-top:2px;
+  }
+  .leaf-body table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.3px;
+    margin-top:6px;
+  }
+  .leaf-body th,.leaf-body td{
+    text-align:left;
+    padding:8px 8px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  .leaf-body th{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--bark);
+  }
+  .leaf-body td:first-child{
+    font-weight:600;
+    white-space:nowrap;
+    color:var(--ink);
+  }
+
+  /* root trunk mark */
+  .root-mark{
+    position:absolute;
+    left:-18px;
+    top:0;
+    bottom:0;
+    width:2px;
+  }
+
+  footer{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--text-dim);
+    padding:30px 20px 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">AOL 101 · Varendra University</div>
+  <h1>Introduction to Sociology</h1>
+  <div class="sub">Every branch of the lecture, kept in full — tap a branch to grow it open, tap again to fold it back.</div>
+  <div class="meta">
+    <span>Course: <b>Art of Living (AOL 101)</b></span>
+    <span>Lecturer: <b>Sudipto Das Shuvo</b></span>
+    <span>Dept: <b>NFE, VU</b></span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <button id="expandAll">Expand all</button>
+  <button id="collapseAll">Collapse all</button>
+  <div class="progress" id="progress"></div>
+</div>
+
+<div class="tree" id="tree"></div>
+
+<footer>Root, trunk, branch, leaf — the whole slide deck, nothing trimmed.</footer>
+
+<script>
+const DATA = [
+  {
+    title: "Introduction",
+    tag: "slide 2",
+    html: `
+      <ul>
+        <li>The word sociology was coined by Auguste Comte – French Philosopher in 1839.</li>
+        <li>He is considered as a father of Sociology.</li>
+        <li>Sociology is the youngest of all the Social Sciences.</li>
+        <li>The word Sociology is derived from the Latin Word &lsquo;Societus&rsquo; which means &lsquo;society&rsquo; and the Greek word &lsquo;logos&rsquo; means &lsquo;science or study or advanced study&rsquo;.</li>
+        <li>Science of society or study of society.</li>
+      </ul>`
+  },
+  {
+    title: "Definition of Sociology",
+    tag: "slide 3",
+    html: `
+      <div class="quote">&ldquo;Sociology is the science of society or of social phenomena.&rdquo;<span class="attrib">— L.F. Ward</span></div>
+      <div class="quote">&ldquo;Sociology is the study of human interaction and interrelation of their conditions and consequences.&rdquo;<span class="attrib">— Ginsberg</span></div>
+      <div class="quote">&ldquo;Sociology as a science of social institutions.&rdquo;<span class="attrib">— Emile Durkheim</span></div>
+      <div class="quote">&ldquo;Sociology as the study of social life.&rdquo;<span class="attrib">— Ogburn and Nimkoff</span></div>
+      <div class="quote">&ldquo;Sociology deals with the behavior of men in groups.&rdquo;<span class="attrib">— Kimball Young</span></div>`
+  },
+  {
+    title: "Nature of Sociology",
+    tag: "slides 4–7",
+    children: [
+      {
+        title: "Sociology is an Independent Science",
+        html: `<ul>
+          <li>Sociology has now emerged into an independent science.</li>
+          <li>It is not treated and studied as a branch of any other science like philosophy or political philosophy or history.</li>
+          <li>As an independent science it has its own field of study, boundary and method.</li>
+        </ul>`
+      },
+      {
+        title: "Sociology is a Social Science, not a Physical Science",
+        html: `<ul>
+          <li>As a social science it concentrates its attention on man, his social behavior, social activities and social life.</li>
+          <li>The fact that sociology deals with the social universe distinguishes it from astronomy, physics, chemistry, geology, mathematics and other physical sciences.</li>
+        </ul>`
+      },
+      {
+        title: "Sociology is Categorical, not Normative",
+        html: `<ul>
+          <li>Sociology &ldquo;confines itself to statements about what it is, not what should be or ought to be.&rdquo;</li>
+          <li>But it does not mean that sociological knowledge is useless and serves no purpose.</li>
+          <li>It only means that sociology as a discipline cannot deal with problems of good and evil, right and wrong, and moral and immoral.</li>
+        </ul>`
+      },
+      {
+        title: "Sociology is a Pure Science, not an Applied Science",
+        html: `<ul>
+          <li>Each pure science may have its own applied field. For instance: physics is a pure science and engineering is its applied field.</li>
+          <li>Sociology as a pure science has its applied field such as administration, diplomacy, social work etc.</li>
+        </ul>`
+      },
+      {
+        title: "Sociology is Relatively Abstract, not Concrete",
+        html: `<ul>
+          <li>Sociology is not interested in the concrete demonstrations of human events only.</li>
+          <li>It is more concerned with the form of human events and their patterns.</li>
+          <li>For example: Sociology is not concerned with particular wars and revolutions but with war and revolution in general, as a social phenomenon, as a type of social conflict.</li>
+        </ul>`
+      },
+      {
+        title: "Sociology is Generalizing, not Particularizing",
+        html: `<ul>
+          <li>Sociology tries to find out the general laws or principles about human interaction and association, about the nature, form, content and structure of human groups and societies.</li>
+          <li>It does not study each and every event that takes place in society. It is not possible also.</li>
+        </ul>`
+      },
+      {
+        title: "Sociology is Both a Rational and Empirical Science",
+        html: `<ul>
+          <li>Rationalism stresses reason and results from logical inference.</li>
+          <li>Empiricism emphasizes experience and the facts that result from observation and experimentation.</li>
+          <li>In sociological inquiry both are significant.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    title: "Scope of Sociology",
+    tag: "slides 8–10",
+    children: [
+      {
+        title: "Overview",
+        html: `<ul>
+          <li>Sociology is a fast growing academic discipline.</li>
+          <li>It has developed various subfields to study different aspects of man&rsquo;s social life.</li>
+          <li>Each subfield employs its own approach and technique.</li>
+        </ul>`
+      },
+      {
+        title: "Scope in the field of Knowledge",
+        html: `<ul>
+          <li>Society is the web of social institutions, and all these institutions are interrelated and interlinked with each other.</li>
+          <li>Sociologists&rsquo; basic and primary objective is to build up knowledge about society and social interaction.</li>
+          <li>Sociologists are required to gain the know-how about social problems and their solutions.</li>
+          <li>The specialized fields of sociology give knowledge to students of sociology about different aspects of human social life.</li>
+        </ul>`
+      },
+      {
+        title: "Scope in the field of Education",
+        html: `<ul>
+          <li>Sociology explains the condition and problems of social life.</li>
+          <li>Sociology is a subject in colleges and universities.</li>
+          <li>There are well-known institutes where sociologists are engaged in research and teaching work.</li>
+          <li>A substantial majority of sociologists teach in one setting or another — high schools, two-year colleges, four-year colleges, or university graduate departments.</li>
+          <li>Sociology is a rewarding field to convey to others. It combines the importance of social relevance with the rigor of a scientific discipline.</li>
+          <li>It is also included in the programs of many professions, such as law, education, business, medicine, engineering, social work, and nursing.</li>
+        </ul>`
+      },
+      {
+        title: "Scope in the field of Research",
+        html: `<ul>
+          <li>Research is second to teaching as the most common career option within sociology.</li>
+          <li>There is not necessarily a choice between teaching and research — many teaching positions, particularly in universities but also in four-year colleges, require research activities.</li>
+          <li>One can do research in a variety of employment settings: a university, a public agency at the federal, state, or local level, a business or industrial firm, or a research institute in the non-profit or advocacy sector.</li>
+        </ul>`
+      }
+    ]
+  },
+  {
+    title: "Origin of Sociology",
+    tag: "slide 11",
+    html: `<ul>
+      <li>Sociology has a long past but short history — it emerged as an independent science in the 19th century (before that, it was part of Social Philosophy / Philosophy of History).</li>
+      <li>Rooted in earlier philosophers: Aristotle, Plato, Confucius (the earliest sociological reflections).</li>
+      <li>Ibn Khaldun (14th century) — often considered a candidate for the &ldquo;first sociologist&rdquo; for his work on social cohesion and conflict (Muqaddimah).</li>
+      <li>The term &ldquo;Sociology&rdquo; was first used by Emmanuel-Joseph Sieyes (1780); it was later independently coined and defined by Auguste Comte (1839), regarded as the &ldquo;Father of Sociology.&rdquo;</li>
+    </ul>`
+  },
+  {
+    title: "Founding Fathers",
+    tag: "slide 12",
+    html: `<table>
+      <tr><th>Thinker</th><th>Key Contribution</th></tr>
+      <tr><td>Auguste Comte<br>(1798–1857)</td><td>Coined &ldquo;Sociology&rdquo;; divided it into social statics &amp; social dynamics.</td></tr>
+      <tr><td>Herbert Spencer<br>(1820–1903)</td><td>&ldquo;Theory of organic analogy,&rdquo; &ldquo;Social Darwinism,&rdquo; survival of the fittest.</td></tr>
+      <tr><td>Emile Durkheim<br>(1858–1917)</td><td>Based sociology on &ldquo;Social Facts&rdquo;; empirical study of Suicide; founder of functionalism.</td></tr>
+      <tr><td>Max Weber<br>(1864–1920)</td><td>Introduced Verstehen (subjective understanding); critiqued Marx; studied bureaucracy &amp; rationalization.</td></tr>
+      <tr><td>Karl Marx<br>(1818–1883)</td><td>Father of conflict theory; society divided into &ldquo;Haves&rdquo; vs. &ldquo;Have Nots&rdquo; (Bourgeoisie vs. Proletariat).</td></tr>
+    </table>`
+  },
+  {
+    title: "Factors Behind Sociology's Development",
+    tag: "slide 13",
+    html: `<ul>
+      <li><strong>French Revolution (1789)</strong> — dramatic class restructuring; sparked interest in social groups and order.</li>
+      <li><strong>Political Revolutions</strong> — chaos and disorder pushed thinkers (Comte, Durkheim) to focus on social order.</li>
+      <li><strong>Industrial Revolution &amp; Capitalism</strong> — transformed agricultural society into an industrial one; studied by Marx, Weber, Durkheim.</li>
+      <li><strong>Enlightenment vs. Conservative Reaction</strong> — reason and rationality (Montesquieu, Rousseau) versus tradition and emotion (Bonald, Maistre).</li>
+      <li><strong>Rise of Socialism</strong> — Marx supported it; Weber and Durkheim opposed revolution, favoring reform instead.</li>
+      <li><strong>Feminism</strong> — gender discrimination and women&rsquo;s liberation (Martineau, Gilman, Addams, and others) shaped early sociology.</li>
+      <li><strong>Urbanization</strong> — migration to cities created problems (overcrowding, pollution) studied by Weber.</li>
+      <li><strong>Religious Change &amp; Growth of Natural Sciences</strong> — inspired the scientific study of society (Comte, Durkheim, Spencer).</li>
+    </ul>`
+  }
+];
+
+const treeEl = document.getElementById('tree');
+let leafCount = 0, openLeaf = 0;
+
+function chevron(){
+  return `<svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function buildNode(item, depth){
+  const node = document.createElement('div');
+  const hasChildren = !!item.children;
+  node.className = 'node' + (hasChildren ? '' : ' leaf');
+  node.setAttribute('data-depth', depth);
+
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `<div class="twisty">${chevron()}</div><div class="label">${item.title}${item.tag ? `<span class="tag">${item.tag}</span>` : ''}</div>`;
+  node.appendChild(row);
+
+  let bodyEl;
+  if(hasChildren){
+    bodyEl = document.createElement('div');
+    bodyEl.className = 'children';
+    item.children.forEach(child => bodyEl.appendChild(buildNode(child, depth+1)));
+  } else {
+    leafCount++;
+    bodyEl = document.createElement('div');
+    bodyEl.className = 'leaf-body';
+    bodyEl.innerHTML = item.html;
+  }
+  node.appendChild(bodyEl);
+
+  row.addEventListener('click', () => toggle(node, bodyEl, hasChildren));
+
+  return node;
+}
+
+function measure(bodyEl){
+  return bodyEl.scrollHeight;
+}
+
+function toggle(node, bodyEl, hasChildren){
+  const isOpen = node.classList.contains('open');
+  if(isOpen){
+    bodyEl.style.maxHeight = bodyEl.scrollHeight + 'px';
+    requestAnimationFrame(()=>{ bodyEl.style.maxHeight = '0px'; });
+    node.classList.remove('open');
+    if(!hasChildren) openLeaf--;
+  } else {
+    node.classList.add('open');
+    bodyEl.style.maxHeight = measure(bodyEl) + 'px';
+    if(!hasChildren) openLeaf++;
+    // grow ancestors
+    let p = node.parentElement;
+    while(p && p.classList && p.classList.contains('children')){
+      p.style.maxHeight = p.scrollHeight + 'px';
+      p = p.parentElement.parentElement;
+    }
+  }
+  updateProgress();
+}
+
+DATA.forEach(item => treeEl.appendChild(buildNode(item, 1)));
+
+function updateProgress(){
+  document.getElementById('progress').textContent = `${openLeaf} / ${leafCount} branches open`;
+}
+updateProgress();
+
+document.getElementById('expandAll').addEventListener('click', () => {
+  document.querySelectorAll('.node').forEach(n => {
+    if(!n.classList.contains('open')) n.classList.add('open');
+  });
+  // set heights after all open, deepest first pass twice for nested max-height
+  for(let i=0;i<3;i++){
+    document.querySelectorAll('.children, .leaf-body').forEach(el => {
+      el.style.maxHeight = el.scrollHeight + 'px';
+    });
+  }
+  openLeaf = leafCount;
+  updateProgress();
+});
+
+document.getElementById('collapseAll').addEventListener('click', () => {
+  document.querySelectorAll('.node.open').forEach(n => n.classList.remove('open'));
+  document.querySelectorAll('.children, .leaf-body').forEach(el => el.style.maxHeight = '0px');
+  openLeaf = 0;
+  updateProgress();
+});
+</script>
+
+</body>
+</html>
