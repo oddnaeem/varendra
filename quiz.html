@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>কুইজ এডিটর</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#EEF2F3;--card:#fff;--ink:#14212B;--mute:#5B6B76;--line:#D5DDE1;--acc:#0B7A63;--on:#fff;--bad:#B3261E}
+@media (prefers-color-scheme:dark){:root{--bg:#0F171C;--card:#18232A;--ink:#E6EEF1;--mute:#93A4AE;--line:#2B3A43;--acc:#3CC9A6;--on:#06231C;--bad:#FF8A80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif}
+[hidden]{display:none!important}
+header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header h1{font-size:18px;margin:0;flex:1;font-weight:600}
+main{max-width:760px;margin:0 auto;padding:14px}
+button,input,textarea{font:inherit;color:inherit}
+button{border:1px solid var(--line);background:var(--card);padding:7px 13px;border-radius:8px;cursor:pointer}
+button.p{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:500}
+button.d{color:var(--bad)}
+button.s{padding:3px 9px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+input,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+textarea{resize:vertical;min-height:70px}
+label{display:block;font-size:14px;color:var(--mute);margin:10px 0 3px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grow{flex:1}
+.item{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.num{min-width:30px;color:var(--mute);font-weight:600;text-align:right}
+.q{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sub{font-size:14px;color:var(--mute)}
+.pill{font-size:13px;padding:1px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+.pill.on{color:var(--acc);border-color:var(--acc)}
+.set{cursor:pointer}
+dialog{width:min(560px,94vw);max-height:92vh;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.opt{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.opt input[type=radio]{width:auto;accent-color:var(--acc)}
+.opt b{width:18px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;z-index:20}
+.err{color:var(--bad);font-size:14px;margin-top:8px;white-space:pre-line}
+</style>
+</head>
+<body>
+<header id="top" hidden>
+  <button id="back" class="s" hidden onclick="loadSets()">← সেট</button>
+  <h1 id="ttl">কুইজ এডিটর</h1>
+  <button class="s" onclick="signOut()">লগআউট</button>
+</header>
+<main>
+  <section id="login" class="card" hidden style="margin-top:12vh">
+    <h1 style="margin:0 0 4px;font-size:22px">কুইজ এডিটর</h1>
+    <div class="sub">আপনার Supabase একাউন্টে লগইন করুন</div>
+    <label for="em">ইমেইল</label><input id="em" type="email" autocomplete="username">
+    <label for="pw">পাসওয়ার্ড</label><input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
+    <div class="err" id="lerr"></div>
+    <button class="p" style="margin-top:12px;width:100%" onclick="signIn()">লগইন</button>
+  </section>
+
+  <section id="sets" hidden>
+    <div class="row" style="margin-bottom:12px">
+      <button class="p" onclick="newSet()">+ নতুন সেট</button>
+      <button onclick="$('#imp').click()">CSV ইমপোর্ট</button>
+      <input id="imp" type="file" accept=".csv,text/csv" hidden onchange="importCSV(this.files[0]);this.value=''">
+    </div>
+    <div id="setlist"></div>
+  </section>
+
+  <section id="set" hidden>
+    <div class="card" id="meta"></div>
+    <div class="row" style="margin-bottom:10px">
+      <input id="srch" class="grow" placeholder="প্রশ্ন খুঁজুন…" oninput="renderQs()">
+      <button class="p" onclick="openQ()">+ প্রশ্ন</button>
+    </div>
+    <div class="card" id="qlist"></div>
+  </section>
+</main>
+<dialog id="dlg"></dialog>
+<div id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+// ===== এখানে নিজের Supabase তথ্য বসান (Project Settings → API) =====
+const SUPABASE_URL = 'https://qsbvvkamhggxlabqhqxa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_HjixmLfLD2DjSuz3UjX2dQ_16PaGVPE';
+// ====================================================================
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let sets = [], cur = null, qs = [];
+
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,2200)}
+function fail(e){console.error(e);alert('ত্রুটি: '+(e.message||e))}
+function show(v){['login','sets','set'].forEach(x=>$('#'+x).hidden=x!==v);$('#top').hidden=v==='login';$('#back').hidden=v!=='set';if(v!=='set')$('#ttl').textContent='কুইজ এডিটর'}
+
+// ---------- auth ----------
+async function init(){
+  if(SUPABASE_URL.includes('YOUR-')){show('login');$('#lerr').textContent='ফাইলের উপরে SUPABASE_URL ও SUPABASE_KEY বসান।';return}
+  const {data}=await sb.auth.getSession();
+  data.session?loadSets():show('login');
+}
+async function signIn(){
+  const {error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
+  if(error){$('#lerr').textContent='লগইন হয়নি: '+error.message;return}
+  $('#lerr').textContent='';loadSets();
+}
+async function signOut(){await sb.auth.signOut();show('login')}
+
+// ---------- sets ----------
+async function loadSets(){
+  const {data,error}=await sb.from('quiz_sets').select('*, questions(count)').order('updated_at',{ascending:false});
+  if(error)return fail(error);
+  sets=data;
+  $('#setlist').innerHTML=sets.length?sets.map(s=>`
+    <div class="card set" onclick="openSet('${s.id}')">
+      <div class="row"><b class="grow">${esc(s.title)}</b>
+        <span class="pill ${s.is_published?'on':''}">${s.is_published?'প্রকাশিত':'ড্রাফট'}</span></div>
+      <div class="sub">${esc(s.badge)}${s.badge?' · ':''}${s.questions[0].count}টি প্রশ্ন · ${s.duration} মিনিট</div>
+    </div>`).join(''):'<div class="card sub">কোনো সেট নেই। নতুন সেট বানান অথবা CSV ইমপোর্ট করুন।</div>';
+  show('sets');
+}
+async function newSet(){
+  const title=prompt('সেটের নাম');if(!title)return;
+  const {data,error}=await sb.from('quiz_sets').insert({title}).select().single();
+  if(error)return fail(error);openSet(data.id);
+}
+async function openSet(id){
+  const {data,error}=await sb.from('quiz_sets').select('*').eq('id',id).single();
+  if(error)return fail(error);
+  cur=data;$('#ttl').textContent=cur.title;
+  $('#meta').innerHTML=`
+    <label for="m_title">শিরোনাম</label><input id="m_title" value="${esc(cur.title)}">
+    <div class="row"><div class="grow"><label for="m_badge">ব্যাজ</label><input id="m_badge" value="${esc(cur.badge)}"></div>
+      <div style="width:110px"><label for="m_dur">সময় (মিনিট)</label><input id="m_dur" type="number" min="1" value="${cur.duration}"></div></div>
+    <label for="m_sub">সাবটাইটেল</label><input id="m_sub" value="${esc(cur.subtitle)}">
+    <label for="m_desc">বিবরণ</label><textarea id="m_desc">${esc(cur.description)}</textarea>
+    <div class="row" style="margin-top:12px">
+      <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink)"><input id="m_pub" type="checkbox" style="width:auto" ${cur.is_published?'checked':''}> প্রকাশিত</label>
+      <span class="grow"></span>
+      <button onclick="exportCSV()">CSV এক্সপোর্ট</button>
+      <button class="d" onclick="delSet()">সেট মুছুন</button>
+      <button class="p" onclick="saveMeta()">সংরক্ষণ</button>
+    </div>`;
+  $('#srch').value='';await loadQs();show('set');$('#ttl').textContent=cur.title;
+}
+async function saveMeta(){
+  const t=$('#m_title').value.trim();if(!t)return alert('শিরোনাম দিন');
+  const {error}=await sb.from('quiz_sets').update({title:t,badge:$('#m_badge').value.trim(),subtitle:$('#m_sub').value.trim(),
+    duration:parseInt($('#m_dur').value)||40,description:$('#m_desc').value.trim(),is_published:$('#m_pub').checked}).eq('id',cur.id);
+  if(error)return fail(error);
+  Object.assign(cur,{title:t,badge:$('#m_badge').value.trim(),subtitle:$('#m_sub').value.trim(),
+    duration:parseInt($('#m_dur').value)||40,description:$('#m_desc').value.trim(),is_published:$('#m_pub').checked});
+  $('#ttl').textContent=t;toast('সংরক্ষিত');
+}
+async function delSet(){
+  if(!confirm(`"${cur.title}" সেট ও এর ${qs.length}টি প্রশ্ন স্থায়ীভাবে মুছে যাবে। নিশ্চিত?`))return;
+  const {error}=await sb.from('quiz_sets').delete().eq('id',cur.id);
+  if(error)return fail(error);toast('মুছে ফেলা হয়েছে');loadSets();
+}
+
+// ---------- questions ----------
+async function loadQs(){
+  const {data,error}=await sb.from('questions').select('*').eq('quiz_id',cur.id).order('position');
+  if(error)return fail(error);qs=data;renderQs();
+}
+function renderQs(){
+  const f=$('#srch').value.trim().toLowerCase();
+  const rows=qs.map((q,i)=>({q,i})).filter(({q})=>!f||(q.question+q.option_a+q.option_b+q.option_c+q.option_d).toLowerCase().includes(f));
+  $('#qlist').innerHTML=rows.length?rows.map(({q,i})=>`
+    <div class="item">
+      <div class="num">${i+1}</div>
+      <div class="grow" style="min-width:0">
+        <div class="q">${esc(q.question)}</div>
+        <div class="sub">উত্তর ${q.answer}: ${esc(q['option_'+q.answer.toLowerCase()])}</div>
+        <div class="row" style="margin-top:6px">
+          <button class="s" onclick="openQ('${q.id}')">এডিট</button>
+          <button class="s" onclick="moveQ(${i},-1)" ${i==0||f?'disabled':''} aria-label="উপরে">↑</button>
+          <button class="s" onclick="moveQ(${i},1)" ${i==qs.length-1||f?'disabled':''} aria-label="নিচে">↓</button>
+          <button class="s d" onclick="delQ('${q.id}')">মুছুন</button>
+        </div>
+      </div>
+    </div>`).join(''):`<div class="sub">${f?'কিছু পাওয়া যায়নি।':'এই সেটে এখনও কোনো প্রশ্ন নেই। "+ প্রশ্ন" চাপুন।'}</div>`;
+}
+function openQ(id){
+  const q=qs.find(x=>x.id===id)||{question:'',option_a:'',option_b:'',option_c:'',option_d:'',answer:'A',explanation:''};
+  $('#dlg').innerHTML=`
+    <b style="font-size:18px">${id?'প্রশ্ন এডিট':'নতুন প্রশ্ন'}</b>
+    <label for="f_q">প্রশ্ন</label><textarea id="f_q">${esc(q.question)}</textarea>
+    <label>অপশন (সঠিক উত্তরের পাশের বাটন চাপুন)</label>
+    ${['A','B','C','D'].map(L=>`<div class="opt"><input type="radio" name="ans" value="${L}" ${q.answer===L?'checked':''} aria-label="${L} সঠিক"><b>${L}</b><input id="f_${L}" value="${esc(q['option_'+L.toLowerCase()])}" aria-label="অপশন ${L}"></div>`).join('')}
+    <label for="f_e">ব্যাখ্যা</label><textarea id="f_e">${esc(q.explanation)}</textarea>
+    <div class="err" id="qerr"></div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end">
+      <button onclick="$('#dlg').close()">বাতিল</button>
+      <button class="p" onclick="saveQ(${id?`'${id}'`:'null'})">সংরক্ষণ</button>
+    </div>`;
+  $('#dlg').showModal();
+}
+async function saveQ(id){
+  const v={question:$('#f_q').value.trim(),option_a:$('#f_A').value.trim(),option_b:$('#f_B').value.trim(),
+    option_c:$('#f_C').value.trim(),option_d:$('#f_D').value.trim(),
+    answer:(document.querySelector('input[name=ans]:checked')||{}).value,explanation:$('#f_e').value.trim()};
+  const errs=[];
+  if(!v.question)errs.push('প্রশ্ন লিখুন');
+  ['a','b','c','d'].forEach(l=>{if(!v['option_'+l])errs.push('অপশন '+l.toUpperCase()+' খালি')});
+  if(!v.answer)errs.push('সঠিক উত্তর বেছে নিন');
+  const opts=[v.option_a,v.option_b,v.option_c,v.option_d];
+  if(new Set(opts).size<4&&opts.every(Boolean))errs.push('দুটি অপশন একই');
+  if(qs.some(q=>q.id!==id&&q.question===v.question))errs.push('এই প্রশ্ন সেটে আগে থেকেই আছে');
+  if(errs.length){$('#qerr').textContent=errs.join('\n');return}
+  const r=id?await sb.from('questions').update(v).eq('id',id)
+            :await sb.from('questions').insert({...v,quiz_id:cur.id,position:qs.length?Math.max(...qs.map(q=>q.position))+1:1});
+  if(r.error)return fail(r.error);
+  $('#dlg').close();toast('সংরক্ষিত');loadQs();
+}
+async function delQ(id){
+  if(!confirm('প্রশ্নটি মুছে ফেলবেন?'))return;
+  const {error}=await sb.from('questions').delete().eq('id',id);
+  if(error)return fail(error);toast('মুছে ফেলা হয়েছে');loadQs();
+}
+async function moveQ(i,d){
+  const a=qs[i],b=qs[i+d];if(!b)return;
+  const r=await Promise.all([sb.from('questions').update({position:b.position}).eq('id',a.id),
+                             sb.from('questions').update({position:a.position}).eq('id',b.id)]);
+  const e=r.find(x=>x.error);if(e)return fail(e.error);loadQs();
+}
+
+// ---------- CSV ----------
+function parseCSV(t){
+  t=t.replace(/^\uFEFF/,'');const rows=[];let r=[],f='',q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===','){r.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(f);f='';rows.push(r);r=[]}
+    else f+=c}
+  if(f!==''||r.length){r.push(f);rows.push(r)}
+  return rows;
+}
+async function importCSV(file){
+  if(!file)return;
+  try{
+    const rows=parseCSV(await file.text()),meta={};let head=null;const data=[];
+    for(const r of rows){
+      const k=(r[0]||'').trim();
+      if(k.startsWith('#')){meta[k.slice(1).toLowerCase()]=(r[1]||'').trim();continue}
+      if(!head){if(k.toLowerCase()==='id')head=r.map(x=>x.trim().toLowerCase());continue}
+      if(r.every(x=>!x.trim()))continue;
+      const o={};head.forEach((h,i)=>o[h]=(r[i]||'').trim());data.push(o);
+    }
+    if(!head)throw new Error('হেডার সারি (id,question,optionA…) পাওয়া যায়নি');
+    const bad=[],out=data.map((o,i)=>{
+      const ans=(o.answer||'').toUpperCase();
+      if(!o.question||!o.optiona||!o.optionb||!o.optionc||!o.optiond||!'ABCD'.includes(ans)||ans.length!==1)bad.push(o.id||i+1);
+      return{position:i+1,question:o.question,option_a:o.optiona,option_b:o.optionb,option_c:o.optionc,option_d:o.optiond,answer:ans,explanation:o.explanation||''};
+    });
+    if(bad.length)throw new Error('এই প্রশ্নগুলোতে সমস্যা (খালি ঘর বা ভুল answer): '+bad.join(', '));
+    const title=meta.title||file.name.replace(/\.csv$/i,'');
+    if(!confirm(`"${title}" — ${out.length}টি প্রশ্ন ইমপোর্ট হবে (ড্রাফট হিসেবে)। চালিয়ে যাবেন?`))return;
+    const s=await sb.from('quiz_sets').insert({title,badge:meta.badge||'',subtitle:meta.subtitle||'',
+      duration:parseInt(meta.duration)||40,description:meta.description||''}).select().single();
+    if(s.error)throw s.error;
+    const q=await sb.from('questions').insert(out.map(o=>({...o,quiz_id:s.data.id})));
+    if(q.error){await sb.from('quiz_sets').delete().eq('id',s.data.id);throw q.error}
+    toast('ইমপোর্ট সম্পন্ন');loadSets();
+  }catch(e){fail(e)}
+}
+function exportCSV(){
+  const c=v=>{v=String(v??'');return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const pad=a=>a.concat(Array(8-a.length).fill('')).map(c).join(',');
+  const L=[['#title',cur.title],['#badge',cur.badge],['#subtitle',cur.subtitle],['#duration',cur.duration],['#description',cur.description],
+    ['id','question','optionA','optionB','optionC','optionD','answer','explanation'],
+    ...qs.map((q,i)=>[i+1,q.question,q.option_a,q.option_b,q.option_c,q.option_d,q.answer,q.explanation])].map(pad);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+L.join('\r\n')],{type:'text/csv;charset=utf-8'}));
+  a.download=(cur.title.replace(/[\\/:*?"<>|]/g,'_')||'quiz')+'.csv';a.click();URL.revokeObjectURL(a.href);
+}
+init();
+</script>
+</body>
+</html>
