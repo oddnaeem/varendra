@@ -1,119 +1,284 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CSV Question Editor — Cloud</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>কুইজ এডিটর</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap">
 <style>
-:root{color-scheme:light;--bg:#f4f6fb;--card:#fff;--ink:#172033;--muted:#65718a;--line:#dce2ee;--accent:#3459d9;--soft:#edf1ff;--danger:#b42318}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Noto Sans Bengali",sans-serif}.wrap{max-width:1100px;margin:auto;padding:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}.top h1{font-size:clamp(22px,4vw,30px);margin:0}.muted{color:var(--muted)}.panel,.qcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 4px 16px #1a2a4a08}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.btn:focus,input:focus,textarea:focus,select:focus{outline:2px solid #9aabff;outline-offset:1px}.meta{display:flex;flex-wrap:wrap;gap:0}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field label{font-size:12px;font-weight:750;color:var(--muted)}input,textarea,select{width:100%;font:inherit;border:1px solid var(--line);border-radius:9px;padding:10px;background:white;color:var(--ink)}textarea{resize:vertical;min-height:68px}.searchrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.searchrow input{flex:1;min-width:170px}.stats{color:var(--muted);font-size:13px}.qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.qnum{font-weight:800}.grid{min-width:0}.answerrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}.answerrow select{width:auto;min-width:110px}.empty{text-align:center;padding:32px;color:var(--muted)}.note{font-size:13px;color:var(--muted);margin-top:8px}.hidden{display:none!important}.public-wrap{max-width:900px;margin:auto;padding:18px}.public-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;margin:12px 0}.public-option{padding:9px 11px;border:1px solid var(--line);border-radius:9px;margin:6px 0}.public-answer{background:#eefbf3;border-color:#9bd7af}.public-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.public-question{font-weight:750;margin-bottom:10px}.public-meta{color:var(--muted);font-size:14px}@media(max-width:650px){.wrap{padding:12px}.meta{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.panel,.qcard{padding:12px}.top{align-items:flex-start}.btn{padding:9px 11px}}
+:root{--bg:#EEF2F3;--card:#fff;--ink:#14212B;--mute:#5B6B76;--line:#D5DDE1;--acc:#0B7A63;--on:#fff;--bad:#B3261E}
+@media (prefers-color-scheme:dark){:root{--bg:#0F171C;--card:#18232A;--ink:#E6EEF1;--mute:#93A4AE;--line:#2B3A43;--acc:#3CC9A6;--on:#06231C;--bad:#FF8A80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif}
+[hidden]{display:none!important}
+header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header h1{font-size:18px;margin:0;flex:1;font-weight:600}
+main{max-width:760px;margin:0 auto;padding:14px}
+button,input,textarea{font:inherit;color:inherit}
+button{border:1px solid var(--line);background:var(--card);padding:7px 13px;border-radius:8px;cursor:pointer}
+button.p{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:500}
+button.d{color:var(--bad)}
+button.s{padding:3px 9px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+input,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+textarea{resize:vertical;min-height:70px}
+label{display:block;font-size:14px;color:var(--mute);margin:10px 0 3px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grow{flex:1}
+.item{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.num{min-width:30px;color:var(--mute);font-weight:600;text-align:right}
+.q{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sub{font-size:14px;color:var(--mute)}
+.pill{font-size:13px;padding:1px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+.pill.on{color:var(--acc);border-color:var(--acc)}
+.set{cursor:pointer}
+dialog{width:min(560px,94vw);max-height:92vh;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.opt{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.opt input[type=radio]{width:auto;accent-color:var(--acc)}
+.opt b{width:18px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;z-index:20}
+.err{color:var(--bad);font-size:14px;margin-top:8px;white-space:pre-line}
+</style>
+</head>
+<body>
+<header id="top" hidden>
+  <button id="back" class="s" hidden onclick="loadSets()">← সেট</button>
+  <h1 id="ttl">কুইজ এডিটর</h1>
+  <button class="s" onclick="signOut()">লগআউট</button>
+</header>
+<main>
+  <section id="login" class="card" hidden style="margin-top:12vh">
+    <h1 style="margin:0 0 4px;font-size:22px">কুইজ এডিটর</h1>
+    <div class="sub">আপনার Supabase একাউন্টে লগইন করুন</div>
+    <label for="em">ইমেইল</label><input id="em" type="email" autocomplete="username">
+    <label for="pw">পাসওয়ার্ড</label><input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
+    <div class="err" id="lerr"></div>
+    <button class="p" style="margin-top:12px;width:100%" onclick="signIn()">লগইন</button>
+  </section>
 
-/* Bootstrap-responsive refinements */
-body{padding-bottom:env(safe-area-inset-bottom)}
-.wrap{width:100%;max-width:1320px;padding:clamp(10px,2.5vw,24px)}
-.panel,.qcard{border-radius:1rem;padding:clamp(12px,2vw,20px)}
-.toolbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
-.toolbar .btn{white-space:normal}
-.field{min-width:0}
-.field input,.field textarea,.field select{min-width:0}
-.qhead{flex-wrap:wrap}
-.searchrow{align-items:stretch}
-.searchrow input{min-width:0;flex:1 1 220px}
-#authPanel{width:calc(100% - 24px);max-width:480px!important;margin:clamp(20px,8vh,80px) auto!important;padding:clamp(16px,4vw,28px)!important}
-@media(max-width:576px){.wrap{padding:10px}.top{gap:10px}.top>div:first-child{width:100%}.top .toolbar{width:100%}.top .toolbar .btn,.top .toolbar label.btn{flex:1 1 calc(50% - .5rem);text-align:center;margin:0}.meta{grid-template-columns:1fr}.searchrow>*{max-width:100%}.searchrow .btn{flex:1 1 100%;min-height:44px}.qhead .toolbar .btn{min-height:40px}.answerrow select{flex:1;width:auto}.public-wrap{padding:10px}}
-</style></head><body>
-<div id="authPanel" style="max-width:480px;margin:8vh auto;padding:24px;background:#fff;border:1px solid #dce2ee;border-radius:18px;box-shadow:0 12px 36px #17203312;font-family:system-ui,-apple-system,sans-serif;color:#172033">
-<h1 style="margin:0 0 6px;font-size:25px">CSV Question Editor</h1><p style="margin:0 0 18px;color:#65718a">Sign in to keep your questions synced to Supabase and access them from another device.</p>
-<label for="authEmail" style="display:block;font-weight:650;margin:12px 0 5px">Email</label><input id="authEmail" class="form-control" type="email" autocomplete="email" style="width:100%;padding:12px;border:1px solid #dce2ee;border-radius:9px;font:inherit">
-<label for="authPassword" style="display:block;font-weight:650;margin:12px 0 5px">Password</label><input id="authPassword" class="form-control" type="password" autocomplete="current-password" style="width:100%;padding:12px;border:1px solid #dce2ee;border-radius:9px;font:inherit">
-<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button id="signInBtn" style="padding:11px 16px;background:#3459d9;color:#fff;border:0;border-radius:9px;font-weight:700">Sign in</button><button id="signUpBtn" style="padding:11px 16px;background:#edf1ff;color:#243b91;border:0;border-radius:9px;font-weight:700">Create account</button></div>
-<p id="authStatus" role="status" style="color:#65718a;font-size:14px;margin:14px 0 0">Your data is private to your signed-in account.</p>
-</div>
-<div id="publicRoot" class="public-wrap hidden">
-  <header class="public-card"><div class="public-top"><div><div class="muted" style="font-weight:750;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Public read-only view</div><h1 id="publicTitle" style="margin:4px 0;font-size:clamp(22px,4vw,30px)">Loading quiz…</h1><div id="publicSubtitle" class="public-meta"></div><div id="publicBadge" class="public-meta"></div></div><div class="public-meta" id="publicCount"></div></div></header>
-  <div class="searchrow public-card"><input id="publicSearch" class="form-control" placeholder="Search questions…" aria-label="Search public questions"><span class="stats" id="publicStats"></span></div>
-  <section id="publicQuestions"></section><div id="publicEmpty" class="public-card empty hidden">No questions found.</div><p class="public-meta" style="text-align:center;padding:12px">Read-only view · Editing is disabled</p>
-</div>
-<main class="wrap" id="appRoot" style="display:none"><header class="top"><div><h1>CSV Question Editor</h1><div class="muted">Add, edit, reorder, and export MCQ questions — cloud-synced with your account. CSV import defaults to ADD, so existing questions stay safe.</div><div id="saveStatus" class="note" role="status">Auto-save is on — no need to download a backup after every edit.</div><div id="publicStatus" class="note" role="status">Public view is private until you publish it.</div></div><div class="toolbar"><button class="btn btn-outline-secondary" id="publishBtn">Publish public view</button><button class="btn btn-outline-secondary" id="copyPublicLinkBtn">Copy public link</button><button class="btn btn-outline-secondary" id="signOutBtn">Sign out</button><label class="btn btn-outline-secondary" for="fileInput">Import CSV</label><input class="hidden" id="fileInput" type="file" accept=".csv,text/csv"><button class="btn btn-outline-secondary" id="backupBtn">Optional backup</button><label class="btn btn-outline-secondary" for="backupInput">Restore backup</label><input class="hidden" id="backupInput" type="file" accept=".json,application/json"><button class="btn btn-primary" id="exportBtn">Export CSV</button></div></header>
-<section class="panel"><h2 style="margin:0 0 12px;font-size:18px">Quiz details</h2><div class="meta row g-3"><div class="field col-12 col-md-6 col-xl-3"><label>Title (#title)</label><input id="title" class="form-control"></div><div class="field col-12 col-md-6 col-xl-3"><label>Badge / subject (#badge)</label><input id="badge" class="form-control"></div><div class="field col-12 col-md-6 col-xl-3"><label>Subtitle (#subtitle)</label><input id="subtitle" class="form-control"></div><div class="field col-12 col-md-6 col-xl-3"><label>Duration in minutes (#duration)</label><input id="duration" class="form-control" type="number" min="1"></div></div><div class="note">CSV import: type ADD to keep existing questions and append new ones, or REPLACE to intentionally replace the list. Exact duplicate questions are skipped in ADD mode. Cloud auto-save is enabled; use Optional backup for extra safety.</div></section>
-<section class="panel"><div class="searchrow"><input id="search" class="form-control" placeholder="Search questions, options, or explanations…" aria-label="Search questions"><span class="stats" id="stats"></span><button class="btn btn-primary" id="addBtn">＋ Add question</button><button class="btn btn-outline-danger" id="deleteAllBtn" title="Permanently delete every question from your cloud database">🗑 Delete ALL questions</button></div></section>
-<section id="questions"></section><div id="empty" class="panel empty hidden">No questions match your search.</div><div class="toolbar" style="justify-content:flex-end;margin:18px 0 30px"><button class="btn btn-primary" id="exportBottom">Export CSV</button></div></main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.js"></script>
+  <section id="sets" hidden>
+    <div class="row" style="margin-bottom:12px">
+      <button class="p" onclick="newSet()">+ নতুন সেট</button>
+      <button onclick="$('#imp').click()">CSV ইমপোর্ট</button>
+      <input id="imp" type="file" accept=".csv,text/csv" hidden onchange="importCSV(this.files[0]);this.value=''">
+    </div>
+    <div id="setlist"></div>
+  </section>
+
+  <section id="set" hidden>
+    <div class="card" id="meta"></div>
+    <div class="row" style="margin-bottom:10px">
+      <input id="srch" class="grow" placeholder="প্রশ্ন খুঁজুন…" oninput="renderQs()">
+      <button class="p" onclick="openQ()">+ প্রশ্ন</button>
+    </div>
+    <div class="card" id="qlist"></div>
+  </section>
+</main>
+<dialog id="dlg"></dialog>
+<div id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const SUPABASE_URL = "https://qmokwizajeinffczlxir.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wh-LR4RvUMkccRudO5LzLA_a6TPa_8p";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-const publicParams = new URLSearchParams(location.search);
-const publicMode = publicParams.get('view') === 'public';
-let currentUser = null, cloudSaveTimer = null, cloudSaving = false, cloudDirty = false, cloudLoading = false, loadedUserId = null;
-let isPublic = false, publicToken = null;
-const initialRows = [["#title", "MCQ পরীক্ষা"], ["#badge", "জীববিজ্ঞান"], ["#subtitle", "পরিপাক ও শোষণ · চলন ও অঙ্গসঞ্চলনা · শ্বসন ও শ্বাসক্রিয়া"], ["#duration", "60"], ["id", "question", "optionA", "optionB", "optionC", "optionD", "answer"], ["1", "মানুষের গোত্র (Family) কোনটি?", "Chordata", "Mammalia", "Hominidae", "Homo", "C"], ["2", "মানুষের দৈনিক গড় পানির চাহিদা কত?", "১-২ লিটার", "২-৩ লিটার", "৪-৫ লিটার", "৩-৪ লিটার", "B"], ["3", "একজন প্রাপ্তবয়স্ক মানুষের দৈনিক কত গ্রাম শর্করা গ্রহণ করা প্রয়োজন?", "১০০-১৫০", "৫০-৫৫", "৪১২-৬০০", "৮-১০", "C"], ["4", "অন্ননালীর দৈর্ঘ্য কত?", "১২.৫ সেমি", "১৫ সেমি", "২৫ সেমি", "৩০ সেমি", "C"], ["5", "পাকস্থলীর আকৃতি কেমন?", "U-আকৃতির", "J-আকৃতির", "C-আকৃতির", "L-আকৃতির", "B"], ["6", "ক্ষুদ্রান্ত্রকে কয়টি অংশে ভাগ করা যায়?", "২টি", "৩টি", "৪টি", "৫টি", "B"], ["7", "শিশুদের দুধে কয়টি দাঁত থাকে?", "২০টি", "৩২টি", "২৪টি", "২৮টি", "A"], ["8", "মানুষের স্থায়ী দন্ত সংকেত কোনটি?", "I2C1P2M3", "I1C2P3M2", "I2C1P0M2", "কোনোটিই নয়", "A"], ["9", "লালা গ্রন্থি থেকে নিঃসৃত কোন এনজাইম শ্বেতসার পরিপাক করে?", "পেপসিন", "টায়ালিন", "ট্রিপসিন", "রেনিন", "B"], ["10", "পাকস্থলীর প্যারাইটাল কোষ থেকে কী নিঃসৃত হয়?", "পেপসিনোজেন", "মিউসিন", "HCl", "গ্যাস্ট্রিন", "C"], ["11", "পাকস্থলীর জাইমোজেনিক কোষ থেকে কোনটি নিঃসৃত হয়?", "HCl", "পেপসিনোজেন", "ইনট্রিনসিক ফ্যাক্টর", "মিউকাস", "B"], ["12", "দুগ্ধ প্রোটিন কেসিনকে জমাট বাঁধাতে সাহায্য করে কোনটি?", "পেপসিন", "রেনিন", "লাইপেজ", "অ্যামাইলেজ", "B"], ["13", "মানবদেহের সর্ববৃহৎ গ্রন্থি কোনটি?", "অগ্ন্যাশয়", "যকৃৎ", "থাইরয়েড", "পিটুইটারি", "B"], ["14", "আইলেটস অব ল্যাঙ্গারহ্যান্স কোথায় পাওয়া যায়?", "যকৃৎ", "অগ্ন্যাশয়", "পাকস্থলী", "লালা গ্রন্থি", "B"], ["15", "অগ্ন্যাশয়ের আলফা কোষ থেকে কোন হরমোন নিঃসৃত হয়?", "ইনসুলিন", "গ্লুকাগন", "সোমাটোস্ট্যাটিন", "গ্যাস্ট্রিন", "B"], ["16", "অগ্ন্যাশয়ের বিটা কোষ থেকে কোন হরমোন নিঃসৃত হয়?", "গ্লুকাগন", "ইনসুলিন", "সোমাটোস্ট্যাটিন", "ইনহিবিটিন", "B"], ["17", "যকৃতে সঞ্চিত শর্করার নাম কী?", "গ্লুকোজ", "ফ্রুক্টোজ", "গ্লাইকোজেন", "ল্যাকটোজ", "C"], ["18", "পিত্তরস কোথায় তৈরি হয়?", "পিত্তথলি", "যকৃৎ", "অগ্ন্যাশয়", "পাকস্থলী", "B"], ["19", "পিত্তরসের pH কত?", "১.৫-৪.০", "৭.৬-৮.৬", "৬.২-৭.৪", "৮.০-৮.৩", "B"], ["20", "কোন হরমোন পাকস্থলী থেকে HCl নিঃসরণ নিয়ন্ত্রণ করে?", "ইনসুলিন", "গ্যাস্ট্রিন", "সিক্রেটিন", "পেপটাইড YY", "B"], ["21", "দেহের রক্ত সঞ্চয় ভাণ্ডার হিসেবে কাজ করে কোনটি?", "হৃদপিণ্ড", "যকৃৎ", "ফুসফুস", "বৃক্ক", "B"], ["22", "BMI-এর পূর্ণরূপ কী?", "Body Mass Index", "Body Muscle Index", "Bone Mass Index", "কোনোটিই নয়", "A"], ["23", "আদর্শ ওজন (Normal Weight) নির্দেশক BMI কত?", "<১৮.৫", "১৮.৫-২৪.৯", "২৫-২৯.৯", "৩০-৩৪.৯", "B"], ["24", "অতিরিক্ত চর্বি গলানোর জন্য কোন হরমোনকে 'ম্যাজিক বুলেট' বলা হয়?", "ইনসুলিন", "থাইরক্সিন", "গ্যাস্ট্রো-ইনটেস্টিনাল হরমোন", "কোনোটিই নয়", "C"], ["25", "গ্যাস্ট্রিক গ্রন্থি থেকে প্রতিদিন কতটুকু রস ক্ষরিত হয়?", "১-১.৫ লিটার", "২ লিটার", "৫০০-৮০০ মিলি", "৩ লিটার", "B"], ["26", "লিপিড বা স্নেহ জাতীয় খাদ্য পরিপাকের পর কী উৎপন্ন হয়?", "গ্লুকোজ", "অ্যামিনো এসিড", "ফ্যাটি এসিড ও গ্লিসারল", "ভিটামিন", "C"], ["27", "শর্করা পরিপাককারী এনজাইম কোনটি?", "ট্রিপসিন", "লাইপেজ", "অ্যামাইলেজ", "ইরেপসিন", "C"], ["28", "প্রোটিন বা আমিষ জাতীয় খাদ্যের চূড়ান্ত পরিণাম কী?", "গ্লুকোজ", "গ্লাইকোজেন", "অ্যামিনো এসিড", "ল্যাকটোজ", "C"], ["29", "যকৃতে ভিটামিন সঞ্চয়ের মধ্যে পানিতে দ্রবণীয় ভিটামিন কোনটি?", "ভিটামিন A", "ভিটামিন D", "ভিটামিন C", "ভিটামিন E", "C"], ["30", "পিত্তলবণ ফ্যাটের ইমালসিফিকেশনে সাহায্য করে—এটি কোথায় ঘটে?", "পাকস্থলী", "মুখগহ্বর", "ক্ষুদ্রান্ত্র", "যকৃৎ", "C"], ["31", "রক্তে গ্লুকোজের মাত্রা কমে গেলে যকৃতে কোন প্রক্রিয়া ঘটে?", "গ্লাইকোজেনেসিস", "গ্লাইকোজেনোলাইসিস", "লাইপোজেনেসিস", "কোনোটিই নয়", "B"], ["32", "অম্লীয় পরিবেশে কোন এনজাইম অধিক কার্যকারী?", "ট্রিপসিন", "পেপসিন", "কাইমোট্রিপসিন", "অ্যামাইলেজ", "B"], ["33", "মানবদেহে কত জোড়া লালা গ্রন্থি থাকে?", "২ জোড়া", "৩ জোড়া", "৪ জোড়া", "১ জোড়া", "B"], ["34", "সবচেয়ে বড় লালা গ্রন্থি কোনটি?", "প্যারোটিড", "সাবম্যান্ডিবুলার", "সাবলিঙ্গুয়াল", "কোনোটিই নয়", "A"], ["35", "লালারসে কোন অ্যান্টিব্যাকটেরিয়াল এনজাইম থাকে?", "টায়ালিন", "লাইসোজাইম", "মিউসিন", "মল্টেজ", "B"], ["36", "পিত্তরসে কোন এনজাইম থাকে না—এটি সত্য না মিথ্যা?", "সত্য", "মিথ্যা", "আংশিক সত্য", "নির্ভর করে", "A"], ["37", "অগ্ন্যাশয় একটি—", "বহিঃক্ষরা গ্রন্থি", "অন্তঃক্ষরা গ্রন্থি", "মিশ্র গ্রন্থি", "কোনোটিই নয়", "C"], ["38", "ক্ষুদ্রান্ত্র ও বৃহদান্ত্রের সংযোগস্থলে কী থাকে?", "ডুওডেনাম", "অ্যাপেন্ডিক্স", "ইলিয়াম", "জেজুনাম", "B"], ["39", "গ্যাস্ট্রিক আলসার সৃষ্টির জন্য দায়ী প্রধান ব্যাকটেরিয়া কোনটি?", "E. coli", "Helicobacter pylori", "Bacillus", "Salmonella", "B"], ["40", "অন্ত্রের ভিলাস (Villus) এর কাজ কী?", "খাদ্য পরিবহন", "শোষণ তল বৃদ্ধি", "রেচন", "শ্বসন", "B"], ["41", "প্রোটিন বিপাকের ফলে উৎপন্ন বিষাক্ত অ্যামোনিয়াকে ইউরিয়ায় রূপান্তরিত করে কোনটি?", "বৃক্ক", "যকৃৎ", "হৃদপিণ্ড", "ফুসফুস", "B"], ["42", "খাদ্য গ্রহণের পর তৃপ্তি বা ক্ষুধা নিবৃত্তির সংকেত দেয় কোনটি?", "ইনসুলিন", "লেপটিন", "গ্যাস্ট্রিন", "কোনোটিই নয়", "B"], ["43", "গবলেট কোষ থেকে কী নিঃসৃত হয়?", "এনজাইম", "মিউকাস", "হরমোন", "এসিড", "B"], ["44", "BMI ৩০-৩৪.৯ হলে মানুষের কোন অবস্থা নির্দেশ করে?", "স্বাভাবিক ওজন", "অতিরিক্ত ওজন", "স্থূলতার ১ম স্তর", "স্থূলতার ২য় স্তর", "C"], ["45", "লালারসের pH কত?", "৬.২-৭.৪", "১.৫-৩.৫", "৮.০-৮.৩", "৪.৫", "A"], ["46", "গ্লাইকোজেনেসিস প্রক্রিয়ায় কোন হরমোন কাজ করে?", "গ্লুকাগন", "ইনসুলিন", "এপিনেফ্রিন", "থাইরক্সিন", "B"], ["47", "শ্বেতসার বা স্টার্চ পরিপাক হয়ে কীসে পরিণত হয়?", "সুক্রোজ", "ল্যাকটোজ", "মল্টোজ", "পেপটন", "C"], ["48", "যকৃতের আবরণীকে কী বলে?", "পেরিকার্ডিয়াম", "প্লুরা", "গ্লিসনস ক্যাপসুল", "পেরিটোনিয়াম", "C"], ["49", "মানব ভ্রূণে কয় সপ্তাহ বয়স থেকে সারফেকটেন্ট ক্ষরণ শুরু হয়?", "২১", "২২", "২৩", "২৪", "C"], ["50", "শ্বসনতন্ত্রের কোন অংশে অক্সিজেন ও কার্বন ডাইঅক্সাইড বিনিময় হয়?", "ট্রাকিওল", "ট্রাকিয়া", "ব্রঙ্কাস", "অ্যালভিওলাস", "D"], ["51", "Adam's Apple কোথায় থাকে?", "ডেস্টিবিউলে", "স্বরযন্ত্রে", "ট্রাকিয়ায়", "ব্রঙ্কাসে", "C"], ["52", "বাম ফুসফুসে কতটি লোবিউল থাকে?", "২", "৪", "৬", "৮", "D"], ["53", "ডায়াফ্রামের ক্ষেত্রে কোনটি প্রযোজ্য?", "শ্বসনে এর কোনো ভূমিকা নেই", "বক্ষ ও উদর গহ্বরকে পৃথক রাখে", "ফ্রেনিক ধমনী রক্ত সংগ্রহ করে", "সকল মেরুদণ্ডী প্রাণীতে পাওয়া যায়", "B"], ["54", "মানবদেহে ডান ফুসফুসে কয়টি লোবিউল থাকে?", "১০", "৮", "৬", "৪", "A"], ["55", "নিচের কোন প্রবাহ চিত্রটি সঠিক?", "ট্রাকিয়া → ব্রংকাই → ব্রঙ্কিওল → অ্যালভিওলার নালী → অ্যালভিওলার থলি → অ্যালভিওলাই", "ব্রংকাই → ট্রাকিয়া → ব্রঙ্কিওল → অ্যালভিওলার নালী → অ্যালভিওলার থলি → অ্যালভিওলাই", "ট্রাকিয়া → ব্রঙ্কিওল → ব্রংকাই → অ্যালভিওলার নালী → অ্যালভিওলার থলি → অ্যালভিওলাই", "ট্রাকিয়া → অ্যালভিওলার থলি → ব্রংকাই → ব্রঙ্কিওল → অ্যালভিওলার নালী → অ্যালভিওলাই", "A"], ["56", "ফুসফুসের সর্বমোট ধারণ ক্ষমতাকে বলে—", "ভাইটাল ক্যাপাসিটি", "টাইডাল বায়ু", "টাইডাল ভলিউম", "রেসিডিউয়াল ভলিউম", "A"], ["57", "অ্যালভিওলাস কোথায় পাওয়া যায়?", "হৃদপিণ্ড", "ফুসফুস", "পাকস্থলী", "বৃক্ক", "B"], ["58", "সেরাস ফ্লুইড কোন অঙ্গকে রক্ষা করে?", "হৃদপিণ্ড", "ফুসফুস", "মস্তিষ্ক", "অস্থিসন্ধি", "B"], ["59", "শ্বসনবৃক্ষের কোন অংশ গ্যাস বিনিময়ে অংশগ্রহণ করে?", "সেকেন্ডারি ব্রঙ্কাস", "টারসিয়ারি ব্রঙ্কাস", "টার্মিনাল ব্রঙ্কিওল", "অ্যালভিওলার নালি", "D"], ["60", "কত সপ্তাহ বয়স্ক মানব ভ্রূণে সর্বপ্রথম সারফেকট্যান্ট ক্ষরণ শুরু হয়?", "২৩", "২৪", "২০", "২৫", "A"], ["61", "শ্বসনতন্ত্রের কোন অংশে অক্সিজেন ও কার্বন ডাইঅক্সাইড বিনিময় হয়?", "ট্রাকিওল", "ট্রাকিয়া", "ব্রঙ্কাস", "অ্যালভিওলাস", "D"], ["62", "নিচের কোনটি ফুসফুসের একক?", "নিউরন", "নেফ্রন", "অ্যালভিওলাস", "ব্রঙ্কিওল", "C"], ["63", "অ্যালভিওলাস কোথায় পাওয়া যায়?", "হৃৎপিণ্ড", "ফুসফুস", "পাকস্থলি", "বৃক্ক", "B"], ["64", "মানবদেহে ডান ফুসফুসে কয়টি লোবিউল থাকে?", "১০", "৮", "৬", "৪", "A"], ["65", "সারফেকট্যান্ট কোনটিতে পাওয়া যায়?", "ব্রঙ্কিওলে", "অ্যালভিওলাসে", "ট্রাকিয়ায়", "ব্রঙ্কাসে", "B"], ["66", "মানুষের ফুসফুসে মোট কয়টি লোব বিদ্যমান?", "২", "৩", "৫", "৪", "C"], ["67", "কোথায় সেরাস ফ্লুইড পাওয়া যায়?", "ফুসফুস", "ব্রঙ্কাস", "ট্রাকিয়া", "অ্যালভিওলাস", "A"], ["68", "শব্দ উৎপন্ন করে—", "ফুসফুস", "ব্রঙ্কাস", "ল্যারিংক্স", "গলবিল", "C"], ["69", "ফুসফুসের সর্বমোট ধারণ ক্ষমতাকে বলে—", "ভাইটাল ক্যাপাসিটি", "টাইডাল বায়ু", "টাইডাল ভলিউম", "রেসিডিউয়াল ভলিউম", "A"], ["70", "শ্বসনতন্ত্রের কোন অংশে অলফ্যাক্টরি কোষ থাকে?", "ভেস্টিবিউল", "নাসাগহ্বর", "পশ্চাৎ নাসারন্ধ্র", "নাসাগলবিল", "B"], ["71", "মানুষের প্রতি ১০০ মিলিলিটার রক্তে কত গ্রাম হিমোগ্লোবিন থাকে?", "১৬", "২০", "২২", "২৪", "A"], ["72", "নিচের কোন প্রবাহ চিত্রটি সঠিক?", "ট্রাকিয়া → ব্রঙ্কাই → ব্রঙ্কিওল → অ্যালভিওলাস", "ব্রঙ্কাই → ট্রাকিয়া → ব্রঙ্কিওল → অ্যালভিওলার", "ট্রাকিয়া → ব্রঙ্কিওল → ব্রঙ্কাই → অ্যালভিওলার নালি → অ্যালভিওলার থলি → অ্যালভিওলাস", "ট্রাকিয়া → অ্যালভিওলার থলি → ব্রঙ্কাই → ব্রঙ্কিওল → অ্যালভিওলার নালি → অ্যালভিওলাস", "A"], ["73", "ডায়াফ্রামের ক্ষেত্রে কোনটি প্রযোজ্য?", "শ্বসনে এর কোনো ভূমিকা নেই", "বক্ষ ও উদর গহ্বরকে পৃথক রাখে", "ফ্রেনিক ধমনি রক্ত সংগ্রহ করে", "সকল মেরুদণ্ডী প্রাণীতে পাওয়া যায়", "B"], ["74", "ফুসফুসে বায়ু প্রবাহের সঠিক গতিপথ কোনটি?", "ল্যারিংক্স → ব্রঙ্কাই → ট্রাকিয়া → অ্যালভিওলি", "ট্রাকিয়া → ল্যারিংক্স → ব্রঙ্কাই → অ্যালভিওলি", "ব্রঙ্কাই → ট্রাকিয়া → ল্যারিংক্স → অ্যালভিওলি", "ল্যারিংক্স → ট্রাকিয়া → ব্রঙ্কাই → অ্যালভিওলি", "D"], ["75", "ওটিটিস মিডিয়া কোন অঙ্গের রোগ?", "চোখ", "নাক", "কান", "গলা", "C"], ["76", "কোন সাইনাসের প্রদাহের কারণে গালে দাঁতে ও মাথায় ব্যথা হয়?", "ফ্রন্টাল", "ম্যাক্সিলারি", "এথময়ডাল", "স্ফেনয়েডাল", "B"], ["77", "ট্রাকিয়া কী দিয়ে গঠিত?", "অস্থি", "তরুণাস্থি", "শিরা", "ধমনী", "B"], ["78", "মানবদেহে বহিঃশ্বসন কয়টি ধাপে সম্পন্ন হয়?", "দুই", "তিন", "চার", "পাঁচ", "A"]];
-let meta={title:'',badge:'',subtitle:'',duration:'60'}, questions=[], nextId=1;
-const STORAGE_KEY='csvQuestionEditor_explanation_autosave_v2';
-function setStatus(msg){const el=document.getElementById('saveStatus');if(el)el.textContent=msg;}
-function saveState(){if(!currentUser||cloudLoading)return;cloudDirty=true;setStatus('☁ Changes pending — syncing to your Supabase database…');clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncCloud,800);}
-async function syncCloud(){if(!currentUser||cloudLoading)return;if(cloudSaving){cloudDirty=true;return;}cloudSaving=true;cloudDirty=false;try{
-  const settings={owner_id:currentUser.id,title:meta.title||'',badge:meta.badge||'',subtitle:meta.subtitle||'',duration:String(meta.duration||'60'),is_public:!!isPublic,public_token:publicToken||crypto.randomUUID(),updated_at:new Date().toISOString()};
-  publicToken=settings.public_token;
-  const sr=await supabaseClient.from('quiz_settings').upsert(settings,{onConflict:'owner_id'});if(sr.error)throw sr.error;
-  const records=questions.map((q,i)=>{if(!q._cloudId)q._cloudId=crypto.randomUUID();return{id:q._cloudId,owner_id:currentUser.id,display_id:String(q.id||i+1),question:q.question||'',option_a:q.A||'',option_b:q.B||'',option_c:q.C||'',option_d:q.D||'',answer:q.answer||'A',explanation:q.explanation||'',sort_order:i,updated_at:new Date().toISOString()};});
-  if(records.length){const wr=await supabaseClient.from('questions').upsert(records,{onConflict:'id'});if(wr.error)throw wr.error;const ids=records.map(x=>x.id);const dr=await supabaseClient.from('questions').delete().eq('owner_id',currentUser.id).not('id','in','('+ids.join(',')+')');if(dr.error)throw dr.error;}
-  else {const dr=await supabaseClient.from('questions').delete().eq('owner_id',currentUser.id);if(dr.error)throw dr.error;}
-  setStatus('✓ Saved to Supabase cloud. Your changes sync automatically.');
-}catch(e){console.error(e);setStatus('⚠ Cloud save failed: '+(e.message||'Please check your connection and sign in again.'));}
-finally{cloudSaving=false;if(cloudDirty){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(syncCloud,250);}}
+// ===== এখানে নিজের Supabase তথ্য বসান (Project Settings → API) =====
+const SUPABASE_URL = 'https://qsbvvkamhggxlabqhqxa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_HjixmLfLD2DjSuz3UjX2dQ_16PaGVPE';
+// ====================================================================
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let sets = [], cur = null, qs = [];
+
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,2200)}
+function fail(e){console.error(e);alert('ত্রুটি: '+(e.message||e))}
+function show(v){['login','sets','set'].forEach(x=>$('#'+x).hidden=x!==v);$('#top').hidden=v==='login';$('#back').hidden=v!=='set';if(v!=='set')$('#ttl').textContent='কুইজ এডিটর'}
+
+// ---------- auth ----------
+async function init(){
+  if(SUPABASE_URL.includes('YOUR-')){show('login');$('#lerr').textContent='ফাইলের উপরে SUPABASE_URL ও SUPABASE_KEY বসান।';return}
+  const {data}=await sb.auth.getSession();
+  data.session?loadSets():show('login');
 }
-async function loadCloud(){if(!currentUser||cloudLoading||loadedUserId===currentUser.id)return;cloudLoading=true;document.getElementById('authPanel').style.display='none';document.getElementById('appRoot').style.display='block';setStatus('Connecting to cloud database…');try{
- const [qr,sr]=await Promise.all([supabaseClient.from('questions').select('*').order('sort_order'),supabaseClient.from('quiz_settings').select('*').eq('owner_id',currentUser.id).maybeSingle()]);if(qr.error)throw qr.error;if(sr.error)throw sr.error;
- if(qr.data.length || sr.data){const st=sr.data||{};isPublic=!!st.is_public;publicToken=st.public_token||crypto.randomUUID();updatePublicControls();meta={title:st.title||'',badge:st.badge||'',subtitle:st.subtitle||'',duration:st.duration||'60'};questions=qr.data.map(r=>({id:String(r.display_id||''),question:r.question||'',A:r.option_a||'',B:r.option_b||'',C:r.option_c||'',D:r.option_d||'',answer:r.answer||'A',explanation:r.explanation||'',_cloudId:r.id}));nextId=Math.max(0,...questions.map(q=>Number(q.id)||0))+1;syncMeta();render();setStatus('✓ Loaded '+questions.length+' questions from Supabase cloud.');}
- else {isPublic=false;publicToken=crypto.randomUUID();updatePublicControls();loadRows(initialRows);setStatus('Importing starter questions into your cloud database…');}
- }catch(e){console.error(e);setStatus('⚠ Could not load cloud data: '+(e.message||'Check your Supabase setup.'));}
- finally{cloudLoading=false;if(questions.length&&!document.getElementById('saveStatus').textContent.includes('Could not load')){if(!questions.every(q=>q._cloudId))await syncCloud();loadedUserId=currentUser?.id||null;}}
+async function signIn(){
+  const {error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
+  if(error){$('#lerr').textContent='লগইন হয়নি: '+error.message;return}
+  $('#lerr').textContent='';loadSets();
 }
-function updatePublicControls(){const b=document.getElementById('publishBtn'),s=document.getElementById('publicStatus');if(b)b.textContent=isPublic?'Unpublish public view':'Publish public view';if(s)s.textContent=isPublic?'✓ Public view is published. Anyone with the link can read the questions.':'Public view is private. Publish it to allow read-only access.';}
-function getPublicLink(){const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('view','public');u.searchParams.set('token',publicToken);return u.href;}
-document.getElementById('publishBtn').addEventListener('click',()=>{isPublic=!isPublic;if(!publicToken)publicToken=crypto.randomUUID();updatePublicControls();saveState();setStatus(isPublic?'Publishing public read-only view…':'Removing public access…');});
-document.getElementById('copyPublicLinkBtn').addEventListener('click',async()=>{if(!isPublic){alert('Publish the public view first.');return;}if(location.protocol==='file:'){alert('This HTML is opened as a local file. To share a working public link, first host this HTML on a web host (for example GitHub Pages or Netlify), then use Copy public link there.');return;}const link=getPublicLink();try{await navigator.clipboard.writeText(link);document.getElementById('publicStatus').textContent='✓ Public link copied. Anyone with the link can read the quiz.';}catch(e){prompt('Copy this public link:',link);}});
-async function loadPublicView(){document.getElementById('authPanel').style.display='none';document.getElementById('appRoot').style.display='none';document.getElementById('publicRoot').classList.remove('hidden');const token=publicParams.get('token');if(!token){document.getElementById('publicTitle').textContent='Public link is incomplete';document.getElementById('publicSubtitle').textContent='The share token is missing from this URL.';return;}try{const sr=await supabaseClient.from('quiz_settings').select('owner_id,title,badge,subtitle,duration,public_token,is_public').eq('public_token',token).eq('is_public',true).maybeSingle();if(sr.error)throw sr.error;if(!sr.data){document.getElementById('publicTitle').textContent='Quiz not available';document.getElementById('publicSubtitle').textContent='This quiz may be unpublished or the link may be incorrect.';return;}const st=sr.data;document.getElementById('publicTitle').textContent=st.title||'Untitled quiz';document.getElementById('publicSubtitle').textContent=st.subtitle||'';document.getElementById('publicBadge').textContent=[st.badge,st.duration?`Duration: ${st.duration} minutes`: ''].filter(Boolean).join(' · ');const qr=await supabaseClient.from('questions').select('display_id,question,option_a,option_b,option_c,option_d,answer,explanation,sort_order').eq('owner_id',st.owner_id).order('sort_order');if(qr.error)throw qr.error;const rows=qr.data||[];document.getElementById('publicCount').textContent=`${rows.length} questions`;const root=document.getElementById('publicQuestions'),term=document.getElementById('publicSearch');function draw(){const qterm=term.value.toLowerCase().trim();root.innerHTML='';let shown=0;rows.forEach((q,i)=>{const hay=[q.display_id,q.question,q.option_a,q.option_b,q.option_c,q.option_d,q.answer,q.explanation].join(' ').toLowerCase();if(qterm&&!hay.includes(qterm))return;shown++;const card=document.createElement('article');card.className='public-card';const opts=[['A',q.option_a],['B',q.option_b],['C',q.option_c],['D',q.option_d]];const optionHtml=opts.map(([k,v])=>'<div class="public-option '+(String(q.answer||'').toUpperCase()===k?'public-answer':'')+'"><strong>'+k+'.</strong> '+escapeHtml(v||'')+'</div>').join('');const answerHtml=q.answer?'<div style="margin-top:10px;font-weight:750;color:#187343">Correct answer: '+escapeHtml(String(q.answer).toUpperCase())+'</div>':'';const explanationHtml=q.explanation?'<div class="public-meta" style="margin-top:6px"><strong>Explanation:</strong> '+escapeHtml(q.explanation)+'</div>':'';card.innerHTML='<div class="public-question">'+(i+1)+'. '+escapeHtml(q.question||'')+'</div>'+optionHtml+answerHtml+explanationHtml;root.appendChild(card)});document.getElementById('publicStats').textContent=`${shown} shown`;document.getElementById('publicEmpty').classList.toggle('hidden',shown!==0);}term.addEventListener('input',draw);draw();}catch(e){console.error(e);document.getElementById('publicTitle').textContent='Could not load quiz';document.getElementById('publicSubtitle').textContent=e.message||'Please check the link and internet connection.';}}
-function restoreState(data){if(!data||!Array.isArray(data.questions)||!data.meta)return false;meta={title:'',badge:'',subtitle:'',duration:'60',...data.meta};questions=data.questions.map(q=>({...blankQuestion(q.id||''),...q,explanation:q.explanation||''}));nextId=Number(data.nextId)||Math.max(0,...questions.map(q=>Number(q.id)||0))+1;syncMeta();render();return true;}
-function loadRows(rows){
- const incomingMeta={title:'',badge:'',subtitle:'',duration:'60'};
- let headerIndex=rows.findIndex(r=>String(r[0]||'').trim().toLowerCase()==='id'&&String(r[1]||'').trim().toLowerCase()==='question');
- for(const r of rows){if(r[0]==='#title')incomingMeta.title=r[1]||'';if(r[0]==='#badge')incomingMeta.badge=r[1]||'';if(r[0]==='#subtitle')incomingMeta.subtitle=r[1]||'';if(r[0]==='#duration')incomingMeta.duration=r[1]||'60'}
- const incoming=[];
- if(headerIndex>=0){for(const r of rows.slice(headerIndex+1)){if(!r.some(x=>String(x||'').trim()))continue;incoming.push({id:String(r[0]||''),question:r[1]||'',A:r[2]||'',B:r[3]||'',C:r[4]||'',D:r[5]||'',answer:(r[6]||'A').toUpperCase(),explanation:r[7]||''})}}
- if(!incoming.length){alert('No questions found in this CSV. Nothing was changed.');return;}
- let mode='replace';
- if(questions.length){const choice=prompt('Import mode:\nType ADD to add these questions while keeping all existing questions.\nType REPLACE to replace the current list.\nCancel to do nothing.','ADD');if(choice===null)return;const c=choice.trim().toUpperCase();if(c!=='ADD'&&c!=='REPLACE'){alert('Import cancelled. Type ADD or REPLACE next time.');return;}mode=c.toLowerCase();}
- let added=0,skipped=0;
- if(mode==='add'){
-   const signature=q=>[q.question,q.A,q.B,q.C,q.D,q.answer].map(v=>String(v||'').trim().toLowerCase().replace(/\s+/g,' ')).join('\u241f');
-   const known=new Set(questions.map(signature));
-   for(const q of incoming){const sig=signature(q);if(known.has(sig)){skipped++;continue;}q.id=String(nextId++);delete q._cloudId;questions.push(q);known.add(sig);added++;}
-   if(!questions.length){questions=incoming;added=incoming.length;}
-   // Keep the existing quiz details when merging; only fill them if currently blank.
-   for(const k of ['title','badge','subtitle','duration'])if(!String(meta[k]||'').trim()&&incomingMeta[k])meta[k]=incomingMeta[k];
- }else{
-   meta=incomingMeta;questions=incoming;added=incoming.length;
- }
- if(!questions.length)questions=[blankQuestion('1')];
- nextId=Math.max(nextId,0,...questions.map(q=>Number(q.id)||0))+0;
- syncMeta();document.getElementById('search').value='';render();saveState();
- setStatus((mode==='add'?'✓ Added '+added+' new question(s); kept existing questions.':'✓ Replaced question list with '+added+' imported question(s).')+(skipped?' Skipped '+skipped+' exact duplicate(s).':'')+' Saving to cloud…');
+async function signOut(){await sb.auth.signOut();show('login')}
+
+// ---------- sets ----------
+async function loadSets(){
+  const {data,error}=await sb.from('quiz_sets').select('*, questions(count)').order('updated_at',{ascending:false});
+  if(error)return fail(error);
+  sets=data;
+  $('#setlist').innerHTML=sets.length?sets.map(s=>`
+    <div class="card set" onclick="openSet('${s.id}')">
+      <div class="row"><b class="grow">${esc(s.title)}</b>
+        <span class="pill ${s.is_published?'on':''}">${s.is_published?'প্রকাশিত':'ড্রাফট'}</span></div>
+      <div class="sub">${esc(s.badge)}${s.badge?' · ':''}${s.questions[0].count}টি প্রশ্ন · ${s.duration} মিনিট</div>
+    </div>`).join(''):'<div class="card sub">কোনো সেট নেই। নতুন সেট বানান অথবা CSV ইমপোর্ট করুন।</div>';
+  show('sets');
 }
-function blankQuestion(id){return{id:String(id),question:'',A:'',B:'',C:'',D:'',answer:'A',explanation:''}}
-function syncMeta(){for(const k of ['title','badge','subtitle','duration'])document.getElementById(k).value=meta[k]??''}
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function render(){const root=document.getElementById('questions'),term=document.getElementById('search').value.toLowerCase().trim();root.innerHTML='';let visible=0;questions.forEach((q,index)=>{const hay=[q.id,q.question,q.A,q.B,q.C,q.D,q.answer,q.explanation].join(' ').toLowerCase();if(term&&!hay.includes(term))return;visible++;const card=document.createElement('article');card.className='qcard';card.innerHTML=`<div class="qhead"><span class="qnum">Question ${index+1} <span class="muted" style="font-weight:400">(ID: ${escapeHtml(q.id)})</span></span><div class="toolbar"><button class="btn btn-outline-secondary" data-action="up" data-index="${index}" ${index===0?'disabled':''} title="Move up">↑</button><button class="btn btn-outline-secondary" data-action="down" data-index="${index}" ${index===questions.length-1?'disabled':''} title="Move down">↓</button><button class="btn btn-outline-danger" data-action="delete" data-index="${index}">Delete</button></div></div><div class="field"><label>Question</label><textarea class="form-control" data-field="question" data-index="${index}" placeholder="Type the question…">${escapeHtml(q.question)}</textarea></div><div class="grid row g-3" style="margin-top:10px">${['A','B','C','D'].map(k=>`<div class="field col-12 col-md-6"><label>Option ${k}</label><input class="form-control" data-field="${k}" data-index="${index}" value="${escapeHtml(q[k])}" placeholder="Option ${k}"></div>`).join('')}</div><div class="field" style="margin-top:10px"><label>Explanation</label><textarea class="form-control" data-field="explanation" data-index="${index}" placeholder="Write the explanation here…">${escapeHtml(q.explanation||"")}</textarea></div><div class="answerrow"><label for="answer-${index}" style="font-weight:700">Correct answer</label><select class="form-select" id="answer-${index}" data-field="answer" data-index="${index}">${['A','B','C','D'].map(k=>`<option value="${k}" ${q.answer===k?'selected':''}>${k}</option>`).join('')}</select></div>`;root.appendChild(card)});document.getElementById('stats').textContent=`${questions.length} question${questions.length===1?'':'s'} · ${visible} shown`;document.getElementById('empty').classList.toggle('hidden',visible!==0)}
-document.getElementById('deleteAllBtn').addEventListener('click',async()=>{const btn=document.getElementById('deleteAllBtn');if(!currentUser){alert('Please sign in first.');return;}if(!questions.length){const ok=confirm('The editor list is already empty. Delete any remaining questions saved in your cloud database for this account?');if(!ok)return;}else{const count=questions.length;if(!confirm(`⚠️ Permanently delete ALL ${count} questions from your cloud database? This cannot be undone. Export CSV or create a backup first if you may need them later.`))return;}btn.disabled=true;const oldLabel=btn.textContent;btn.textContent='Deleting…';clearTimeout(cloudSaveTimer);questions=[];nextId=1;document.getElementById('search').value='';render();cloudDirty=true;setStatus('Deleting all questions from Supabase cloud…');try{await syncCloud();if(document.getElementById('saveStatus').textContent.startsWith('✓ Saved to Supabase cloud')){setStatus('✓ All questions deleted from the cloud database.');}else if(!document.getElementById('saveStatus').textContent.includes('Cloud save failed')){setStatus('Delete request sent. Please check the cloud save status.');}}finally{btn.disabled=false;btn.textContent=oldLabel;}});
-document.getElementById('questions').addEventListener('input',e=>{const el=e.target;if(!el.dataset.field||el.dataset.field==='id')return;const q=questions[Number(el.dataset.index)];if(q){q[el.dataset.field]=el.value;saveState()}});document.getElementById('questions').addEventListener('change',e=>{const el=e.target;if(!el.dataset.field)return;const q=questions[Number(el.dataset.index)];if(q){q[el.dataset.field]=el.value;saveState()}});document.getElementById('questions').addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(!b)return;const i=Number(b.dataset.index),action=b.dataset.action;if(action==='delete'){if(confirm('Delete this question?'))questions.splice(i,1)}else if(action==='up'&&i>0){[questions[i-1],questions[i]]=[questions[i],questions[i-1]]}else if(action==='down'&&i<questions.length-1){[questions[i+1],questions[i]]=[questions[i],questions[i+1]]}render();saveState()});
-for(const k of ['title','badge','subtitle','duration'])document.getElementById(k).addEventListener('input',e=>{meta[k]=e.target.value;saveState()});document.getElementById('search').addEventListener('input',render);document.getElementById('addBtn').addEventListener('click',()=>{questions.push(blankQuestion(nextId++));document.getElementById('search').value='';render();saveState();setTimeout(()=>document.querySelectorAll('.qcard textarea[data-field="question"]')[questions.length-1]?.focus(),0)});
-function csvCell(v){let s=String(v??'');return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}function exportCsv(){const rows=[['#title',meta.title],['#badge',meta.badge],['#subtitle',meta.subtitle],['#duration',meta.duration],['id','question','optionA','optionB','optionC','optionD','answer','explanation']];questions.forEach((q,i)=>{rows.push([q.id||String(i+1),q.question,q.A,q.B,q.C,q.D,q.answer,q.explanation||''])});const csv='\ufeff'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='edited_questions.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}document.getElementById('exportBtn').addEventListener('click',exportCsv);document.getElementById('exportBottom').addEventListener('click',exportCsv);
-function downloadFile(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-document.getElementById('backupBtn').addEventListener('click',()=>{saveState();downloadFile('question_editor_backup.json',JSON.stringify({version:1,meta,questions,nextId},null,2),'application/json');const status=document.getElementById('saveStatus');if(status)status.textContent='✓ Backup downloaded. Find question_editor_backup.json in your phone’s Downloads folder.'});
-document.getElementById('backupInput').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data||!data.meta||!Array.isArray(data.questions))throw new Error('Invalid backup');meta={title:'',badge:'',subtitle:'',duration:'60',...data.meta};questions=data.questions.map(q=>({...blankQuestion(q.id||''),...q,explanation:q.explanation||''}));nextId=Number(data.nextId)||Math.max(0,...questions.map(q=>Number(q.id)||0))+1;syncMeta();render();saveState();alert('Backup restored successfully.');}catch(err){alert('Could not restore this backup. Please select a valid question_editor_backup.json file.')}e.target.value=''});
-document.getElementById('fileInput').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const txt=(await file.text()).replace(/^\ufeff/,'');loadRows(parseCsv(txt));}catch(err){alert('Could not read this CSV. Please check the file format.')}e.target.value=''});
-function parseCsv(text){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){cell+='"';i++}else if(c==='"')quoted=false;else cell+=c}else{if(c==='"')quoted=true;else if(c===','){row.push(cell);cell=''}else if(c==='\n'){row.push(cell.replace(/\r$/,''));rows.push(row);row=[];cell=''}else cell+=c}}if(cell.length||row.length){row.push(cell.replace(/\r$/,''));rows.push(row)}return rows}
-async function handleSignIn(){const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;const status=document.getElementById('authStatus');if(!email||!password){status.textContent='Enter your email and password first.';return;}status.textContent='Signing in…';const {error}=await supabaseClient.auth.signInWithPassword({email,password});status.textContent=error?error.message:'Signed in.';}
-async function handleSignUp(){const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;const status=document.getElementById('authStatus');if(!email||password.length<6){status.textContent='Enter an email and a password with at least 6 characters.';return;}status.textContent='Creating account…';const {data,error}=await supabaseClient.auth.signUp({email,password});if(error){status.textContent=error.message;return;}status.textContent=data.session?'Account created. Opening your editor…':'Account created. Check your email for a confirmation link, then sign in.';}
-document.getElementById('signInBtn').addEventListener('click',handleSignIn);document.getElementById('signUpBtn').addEventListener('click',handleSignUp);document.getElementById('signOutBtn').addEventListener('click',async()=>{await syncCloud();await supabaseClient.auth.signOut();});
-supabaseClient.auth.onAuthStateChange((event,session)=>{if(publicMode)return;const nextUser=session?.user||null;currentUser=nextUser;if(currentUser){if(loadedUserId!==currentUser.id&&['INITIAL_SESSION','SIGNED_IN','USER_UPDATED'].includes(event))setTimeout(()=>loadCloud(),0);}else if(event==='SIGNED_OUT'){loadedUserId=null;document.getElementById('appRoot').style.display='none';document.getElementById('authPanel').style.display='block';document.getElementById('authStatus').textContent='Sign in to access your cloud-saved questions.';}});
-(async()=>{if(publicMode){await loadPublicView();return;}const {data,error}=await supabaseClient.auth.getSession();if(error){document.getElementById('authStatus').textContent=error.message;return;}currentUser=data.session?.user||null;if(currentUser)await loadCloud();})();
-</script></body></html>
+async function newSet(){
+  const title=prompt('সেটের নাম');if(!title)return;
+  const {data,error}=await sb.from('quiz_sets').insert({title}).select().single();
+  if(error)return fail(error);openSet(data.id);
+}
+async function openSet(id){
+  const {data,error}=await sb.from('quiz_sets').select('*').eq('id',id).single();
+  if(error)return fail(error);
+  cur=data;$('#ttl').textContent=cur.title;
+  $('#meta').innerHTML=`
+    <label for="m_title">শিরোনাম</label><input id="m_title" value="${esc(cur.title)}">
+    <div class="row"><div class="grow"><label for="m_badge">ব্যাজ</label><input id="m_badge" value="${esc(cur.badge)}"></div>
+      <div style="width:110px"><label for="m_dur">সময় (মিনিট)</label><input id="m_dur" type="number" min="1" value="${cur.duration}"></div></div>
+    <label for="m_sub">সাবটাইটেল</label><input id="m_sub" value="${esc(cur.subtitle)}">
+    <label for="m_desc">বিবরণ</label><textarea id="m_desc">${esc(cur.description)}</textarea>
+    <div class="row" style="margin-top:12px">
+      <label style="margin:0;display:flex;gap:6px;align-items:center;color:var(--ink)"><input id="m_pub" type="checkbox" style="width:auto" ${cur.is_published?'checked':''}> প্রকাশিত</label>
+      <span class="grow"></span>
+      <button onclick="exportCSV()">CSV এক্সপোর্ট</button>
+      <button class="d" onclick="delSet()">সেট মুছুন</button>
+      <button class="p" onclick="saveMeta()">সংরক্ষণ</button>
+    </div>`;
+  $('#srch').value='';await loadQs();show('set');$('#ttl').textContent=cur.title;
+}
+async function saveMeta(){
+  const t=$('#m_title').value.trim();if(!t)return alert('শিরোনাম দিন');
+  const {error}=await sb.from('quiz_sets').update({title:t,badge:$('#m_badge').value.trim(),subtitle:$('#m_sub').value.trim(),
+    duration:parseInt($('#m_dur').value)||40,description:$('#m_desc').value.trim(),is_published:$('#m_pub').checked}).eq('id',cur.id);
+  if(error)return fail(error);
+  Object.assign(cur,{title:t,badge:$('#m_badge').value.trim(),subtitle:$('#m_sub').value.trim(),
+    duration:parseInt($('#m_dur').value)||40,description:$('#m_desc').value.trim(),is_published:$('#m_pub').checked});
+  $('#ttl').textContent=t;toast('সংরক্ষিত');
+}
+async function delSet(){
+  if(!confirm(`"${cur.title}" সেট ও এর ${qs.length}টি প্রশ্ন স্থায়ীভাবে মুছে যাবে। নিশ্চিত?`))return;
+  const {error}=await sb.from('quiz_sets').delete().eq('id',cur.id);
+  if(error)return fail(error);toast('মুছে ফেলা হয়েছে');loadSets();
+}
+
+// ---------- questions ----------
+async function loadQs(){
+  const {data,error}=await sb.from('questions').select('*').eq('quiz_id',cur.id).order('position');
+  if(error)return fail(error);qs=data;renderQs();
+}
+function renderQs(){
+  const f=$('#srch').value.trim().toLowerCase();
+  const rows=qs.map((q,i)=>({q,i})).filter(({q})=>!f||(q.question+q.option_a+q.option_b+q.option_c+q.option_d).toLowerCase().includes(f));
+  $('#qlist').innerHTML=rows.length?rows.map(({q,i})=>`
+    <div class="item">
+      <div class="num">${i+1}</div>
+      <div class="grow" style="min-width:0">
+        <div class="q">${esc(q.question)}</div>
+        <div class="sub">উত্তর ${q.answer}: ${esc(q['option_'+q.answer.toLowerCase()])}</div>
+        <div class="row" style="margin-top:6px">
+          <button class="s" onclick="openQ('${q.id}')">এডিট</button>
+          <button class="s" onclick="moveQ(${i},-1)" ${i==0||f?'disabled':''} aria-label="উপরে">↑</button>
+          <button class="s" onclick="moveQ(${i},1)" ${i==qs.length-1||f?'disabled':''} aria-label="নিচে">↓</button>
+          <button class="s d" onclick="delQ('${q.id}')">মুছুন</button>
+        </div>
+      </div>
+    </div>`).join(''):`<div class="sub">${f?'কিছু পাওয়া যায়নি।':'এই সেটে এখনও কোনো প্রশ্ন নেই। "+ প্রশ্ন" চাপুন।'}</div>`;
+}
+function openQ(id){
+  const q=qs.find(x=>x.id===id)||{question:'',option_a:'',option_b:'',option_c:'',option_d:'',answer:'A',explanation:''};
+  $('#dlg').innerHTML=`
+    <b style="font-size:18px">${id?'প্রশ্ন এডিট':'নতুন প্রশ্ন'}</b>
+    <label for="f_q">প্রশ্ন</label><textarea id="f_q">${esc(q.question)}</textarea>
+    <label>অপশন (সঠিক উত্তরের পাশের বাটন চাপুন)</label>
+    ${['A','B','C','D'].map(L=>`<div class="opt"><input type="radio" name="ans" value="${L}" ${q.answer===L?'checked':''} aria-label="${L} সঠিক"><b>${L}</b><input id="f_${L}" value="${esc(q['option_'+L.toLowerCase()])}" aria-label="অপশন ${L}"></div>`).join('')}
+    <label for="f_e">ব্যাখ্যা</label><textarea id="f_e">${esc(q.explanation)}</textarea>
+    <div class="err" id="qerr"></div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end">
+      <button onclick="$('#dlg').close()">বাতিল</button>
+      <button class="p" onclick="saveQ(${id?`'${id}'`:'null'})">সংরক্ষণ</button>
+    </div>`;
+  $('#dlg').showModal();
+}
+async function saveQ(id){
+  const v={question:$('#f_q').value.trim(),option_a:$('#f_A').value.trim(),option_b:$('#f_B').value.trim(),
+    option_c:$('#f_C').value.trim(),option_d:$('#f_D').value.trim(),
+    answer:(document.querySelector('input[name=ans]:checked')||{}).value,explanation:$('#f_e').value.trim()};
+  const errs=[];
+  if(!v.question)errs.push('প্রশ্ন লিখুন');
+  ['a','b','c','d'].forEach(l=>{if(!v['option_'+l])errs.push('অপশন '+l.toUpperCase()+' খালি')});
+  if(!v.answer)errs.push('সঠিক উত্তর বেছে নিন');
+  const opts=[v.option_a,v.option_b,v.option_c,v.option_d];
+  if(new Set(opts).size<4&&opts.every(Boolean))errs.push('দুটি অপশন একই');
+  if(qs.some(q=>q.id!==id&&q.question===v.question))errs.push('এই প্রশ্ন সেটে আগে থেকেই আছে');
+  if(errs.length){$('#qerr').textContent=errs.join('\n');return}
+  const r=id?await sb.from('questions').update(v).eq('id',id)
+            :await sb.from('questions').insert({...v,quiz_id:cur.id,position:qs.length?Math.max(...qs.map(q=>q.position))+1:1});
+  if(r.error)return fail(r.error);
+  $('#dlg').close();toast('সংরক্ষিত');loadQs();
+}
+async function delQ(id){
+  if(!confirm('প্রশ্নটি মুছে ফেলবেন?'))return;
+  const {error}=await sb.from('questions').delete().eq('id',id);
+  if(error)return fail(error);toast('মুছে ফেলা হয়েছে');loadQs();
+}
+async function moveQ(i,d){
+  const a=qs[i],b=qs[i+d];if(!b)return;
+  const r=await Promise.all([sb.from('questions').update({position:b.position}).eq('id',a.id),
+                             sb.from('questions').update({position:a.position}).eq('id',b.id)]);
+  const e=r.find(x=>x.error);if(e)return fail(e.error);loadQs();
+}
+
+// ---------- CSV ----------
+function parseCSV(t){
+  t=t.replace(/^\uFEFF/,'');const rows=[];let r=[],f='',q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===','){r.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(f);f='';rows.push(r);r=[]}
+    else f+=c}
+  if(f!==''||r.length){r.push(f);rows.push(r)}
+  return rows;
+}
+async function importCSV(file){
+  if(!file)return;
+  try{
+    const rows=parseCSV(await file.text()),meta={};let head=null;const data=[];
+    for(const r of rows){
+      const k=(r[0]||'').trim();
+      if(k.startsWith('#')){meta[k.slice(1).toLowerCase()]=(r[1]||'').trim();continue}
+      if(!head){if(k.toLowerCase()==='id')head=r.map(x=>x.trim().toLowerCase());continue}
+      if(r.every(x=>!x.trim()))continue;
+      const o={};head.forEach((h,i)=>o[h]=(r[i]||'').trim());data.push(o);
+    }
+    if(!head)throw new Error('হেডার সারি (id,question,optionA…) পাওয়া যায়নি');
+    const bad=[],out=data.map((o,i)=>{
+      const ans=(o.answer||'').toUpperCase();
+      if(!o.question||!o.optiona||!o.optionb||!o.optionc||!o.optiond||!'ABCD'.includes(ans)||ans.length!==1)bad.push(o.id||i+1);
+      return{position:i+1,question:o.question,option_a:o.optiona,option_b:o.optionb,option_c:o.optionc,option_d:o.optiond,answer:ans,explanation:o.explanation||''};
+    });
+    if(bad.length)throw new Error('এই প্রশ্নগুলোতে সমস্যা (খালি ঘর বা ভুল answer): '+bad.join(', '));
+    const title=meta.title||file.name.replace(/\.csv$/i,'');
+    if(!confirm(`"${title}" — ${out.length}টি প্রশ্ন ইমপোর্ট হবে (ড্রাফট হিসেবে)। চালিয়ে যাবেন?`))return;
+    const s=await sb.from('quiz_sets').insert({title,badge:meta.badge||'',subtitle:meta.subtitle||'',
+      duration:parseInt(meta.duration)||40,description:meta.description||''}).select().single();
+    if(s.error)throw s.error;
+    const q=await sb.from('questions').insert(out.map(o=>({...o,quiz_id:s.data.id})));
+    if(q.error){await sb.from('quiz_sets').delete().eq('id',s.data.id);throw q.error}
+    toast('ইমপোর্ট সম্পন্ন');loadSets();
+  }catch(e){fail(e)}
+}
+function exportCSV(){
+  const c=v=>{v=String(v??'');return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const pad=a=>a.concat(Array(8-a.length).fill('')).map(c).join(',');
+  const L=[['#title',cur.title],['#badge',cur.badge],['#subtitle',cur.subtitle],['#duration',cur.duration],['#description',cur.description],
+    ['id','question','optionA','optionB','optionC','optionD','answer','explanation'],
+    ...qs.map((q,i)=>[i+1,q.question,q.option_a,q.option_b,q.option_c,q.option_d,q.answer,q.explanation])].map(pad);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+L.join('\r\n')],{type:'text/csv;charset=utf-8'}));
+  a.download=(cur.title.replace(/[\\/:*?"<>|]/g,'_')||'quiz')+'.csv';a.click();URL.revokeObjectURL(a.href);
+}
+init();
+</script>
+</body>
+</html>
